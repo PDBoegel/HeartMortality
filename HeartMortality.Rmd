@@ -1,0 +1,41 @@
+
+Gathering Data:
+```{r}
+setwd("~/ACT SCI 654")
+heartmort1 = read.csv(file = "HeartMort.csv", header = TRUE)
+heartmort = heartmort[-c(1:4)]
+```
+
+
+```{r}
+
+
+for(i in 1:3156){
+  heartmort$PCTPOPOVER65[i] = 100 - heartmort$PCTPOPUNDER30[i] - heartmort$PCTPOP30TO65[i]
+  
+}
+naivelm = lm(HDMORTPERPERSON ~ ., data = heartmort)
+summary(naivelm)
+```
+
+```{r}
+
+heartmort$PCTPOPOVER65 = 100 - heartmort$PCTPOP30TO65 - heartmort$PCTPOPUNDER30
+
+naivelm2 = lm(TOTHDMORT ~ ., data = heartmort)
+summary(naivelm2)
+
+
+```
+
+```{r}
+
+summary(heartmort)
+hist(heartmort[,])
+hist(log(heartmort$POPSIZE))
+
+apply(heartmort , 2, hist)
+names(dimnames(heartmort)) <- c("row", "col")
+```
+
+
