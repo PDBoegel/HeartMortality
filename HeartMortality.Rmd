@@ -99,5 +99,4 @@ theartmort$PCTUNEMPLOYED = log(heartmort$PCTUNEMPLOYED)
 ```{r}
 tlm = lm(HDMORTPERPERSON ~ ., data = theartmort)
 
-
 ```
