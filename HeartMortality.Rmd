@@ -80,8 +80,23 @@ HOUSINGUNITDENSITY [log]
 AVGINCOMEPERPERSON [log]
 
 TOTUNEMPLOYED [log]
+PCTUNEMPLOYED [log]
+
+```{r}
+theartmort = heartmort
+theartmort$POPSIZE = log(heartmort$POPSIZE)
+theartmort$HDMORTPERPERSON = log(heartmort$HDMORTPERPERSON)
+theartmort$TOTHDMORT = log(heartmort$TOTHDMORT)
+theartmort$POPDENSITY = log(heartmort$POPDENSITY)
+theartmort$HOUSINGUNITS = log(heartmort$HOUSINGUNITS)
+theartmort$HOUSINGUNITDENSITY = log(heartmort$HOUSINGUNITDENSITY)
+theartmort$AVGINCOMEPERPERSON = log(heartmort$AVGINCOMEPERPERSON)
+theartmort$TOTUNEMPLOYED = log(heartmort$TOTUNEMPLOYED)
+theartmort$PCTUNEMPLOYED = log(heartmort$PCTUNEMPLOYED)
+```
+
+```{r}
+tlm = lm(HDMORTPERPERSON ~ ., data = theartmort)
 
 
-
-
-
+```
