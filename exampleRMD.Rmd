@@ -1,0 +1,144 @@
+---
+title: "Put Title here"
+author: 'Put Authors here'
+date: "Put Date here"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    theme: united
+---
+
+This document was created to give a few examples of different ways to format text/code in RMarkdown. The header above is used to specify title, author, date. Output specifies what type of document we want (should stick with html and if we want a pdf we can convert it later). 
+
+toc: if we want a table of contents
+
+toc_depth: how many levels of sections it should table   
+
+# A # will create a new Section
+
+## A ## will create a subsection within a section
+
+### and ### will create another subsection to the subsection ect.
+
+#### This is depth 4 and won't get tabled by the toc unless we set toc_depth to 4
+
+# Be careful about where you place text in the Rmd document.
+
+As
+## you can see in the Rmd this is a new line, however since there is text immediately before it, no subsection is created.
+
+It also affects paregraphs as well.
+If you want a new paragraph you need a empty line inbetween.
+
+Like so.
+
+## To avoid this you need to have a blank line invetween the section heading and the text that you want to be a paragraph.
+Text immediately after a subsection like this is fine, however to be on the safe side and for formatting it probably is still better to have an empty line inbetween.
+
+# Code
+
+To set up a code block just copy the code you want into a code chunk segment.
+
+A code chunk segment with no code in it looks like this 
+
+```{r}
+# It'll put the code into a nice grey box
+# Comments will still apear in greyed out text within the box
+```
+
+A code chunk with code in it looks like this
+
+```{r}
+1 + 1
+mean(c(2,3,4))
+rnorm(1)
+```
+
+The output from the code is put into another box the immediately proceeds the code segment box. You can also run the code inside the Rmd document to see the output without knitting.
+
+## Holding results
+
+Sometimes you will have multiple things print in a code segment. Without doing anything the output is immediately printed and will result in the above pattern of code/output/code/output which may not be desirable.
+
+We can fix that by putting an argument into the code chunk "results = 'hold'"
+```{r, results='hold'}
+1 + 1
+mean(c(2,3,4))
+rnorm(1)
+```
+
+## Removing messages
+
+Sometimes when using packages errors/warnings appear.
+
+```{r}
+library(actuar)
+```
+
+Set "warning = FALSE" and "message = FALSE"
+
+```{r, warning = FALSE, message = FALSE}
+detach("package:actuar") #Used to show argument
+library(actuar)
+```
+
+## Other Useful Arguments
+
+To show code, but not have it ran, set "eval=FALSE"
+
+```{r, eval=FALSE}
+CodeIDontWantRan <- mean(c(4,1,4,4,5))
+CodeIDontWantRan
+```
+
+An output box isn't generated since no code is ran.
+
+If you want code to run but not appear in the document set "include = FALSE"
+
+```{r, include = FALSE}
+data <- read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
+```
+
+Nothing has been outputed to the actual html file, however the new variable can still be used later in the document.
+
+If you want to add a caption to a graphical output set "fig.cap = "[Caption goes here]""
+
+```{r, fig.cap = "Caption for the plot output"}
+hist(data$POPDENSITY)
+```
+
+# Text options
+
+## Bold, Italics, superscript, Subscript, Underline, Highlight
+
+To make text appear a certain way follow the examples below:
+
+To bold use either:  **bold** __bold__ 
+
+Italics: *italics* _itlatics_
+
+SuperScript: F^6^
+
+Subscript: H~2~O
+
+Underline: <span style="text-decoration: underline"> Underline </span>
+
+Highlight: <span style="background-color: #FFFF00"> Highlight </span>
+
+## latex
+
+To get latex symbols into the dcument use "\(\symbol\)"
+
+Beta: \(\beta\)
+
+epsilon: \(\epsilon\)
+
+delta: \(\delta\)
+
+Beta~1~: \(\beta\)~1~
+
+
+# Another Resource for RMD
+
+[This is also how you do a hyperlink in the text.](http://www.stat.cmu.edu/~cshalizi/rmarkdown/)
