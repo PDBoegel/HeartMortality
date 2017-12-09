@@ -12,17 +12,11 @@ naivelm = lm(HDMORTPERPERSON ~ ., data = heartmort)
 summary(naivelm)
 ```
 
-```{r}
-naivelm2 = lm(TOTHDMORT ~ ., data = heartmort)
-summary(naivelm2)
-```
+
 
 ```{r}
 summary(heartmort)
 hist(log(heartmort$POPSIZE))
-
-apply(heartmort , 2, hist)
-names(dimnames(heartmort)) <- c("row", "col")
 ```
 
 
@@ -49,9 +43,44 @@ hist(heartmort$PCTUNEMPLOYED)
 hist(heartmort$PCTOBESE)
 hist(heartmort$PCTPOPUNDER65)
 ```
+
+
+```{r}
+
+hist(log(heartmort$POPSIZE))
+hist(log(heartmort$HDMORTPERPERSON))
+hist(log(heartmort$TOTHDMORT))
+hist(log(heartmort$POPDENSITY))
+hist(log(heartmort$HOUSINGUNITS))
+hist(log(heartmort$HOUSINGUNITDENSITY))
+hist(log(heartmort$AVGINCOMEPERPERSON))
+hist(log(heartmort$PCTDIABETES))
+hist(log(heartmort$PCTMALE))
+hist(log(heartmort$PCTFEMALE))
+hist(log(heartmort$PCTWHITE))
+hist(log(heartmort$PCTAFRAM))
+hist(log(heartmort$PCTASIANAM))
+hist(log(heartmort$PCTNATIVEAM))
+hist(log(heartmort$LOWEDUCATION))
+hist(log(heartmort$MEDEDUCATION))
+hist(log(heartmort$HIGHEDUCATION))
+hist(log(heartmort$TOTUNEMPLOYED))
+hist(log(heartmort$PCTUNEMPLOYED))
+hist(log(heartmort$PCTOBESE))
+hist(log(heartmort$PCTPOPUNDER65))
+```
 Variables that need to be transformed:
 
-POPSIZE
+POPSIZE [log]
+HDMORTPERPERSON [log]
+TOTHDMORT [log]
+POPDENSITY [log]
+HOUSINGUNITS [log]
+HOUSINGUNITDENSITY [log]
+AVGINCOMEPERPERSON [log]
+
+TOTUNEMPLOYED [log]
+
 
 
 
