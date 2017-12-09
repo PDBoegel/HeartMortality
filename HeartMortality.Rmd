@@ -1,10 +1,19 @@
+```{r, echo = FALSE}
+#Functions used throughout document
+makeHistograms <- function(df) {
+  
+  
+}
+
+```
 
 Gathering Data:
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
-heartmort = heartmortCOMPLETE[-c(1:4,24:26)]
+heartmort = heartmortCOMPLETE[-c(1:4,7,24:26)] #Getting rid of variables for metadata and other dependent variable
 ```
 
+# Naive linear model for insights
 
 ```{r}
 heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30
@@ -13,17 +22,9 @@ summary(naivelm)
 ```
 
 
-
-```{r}
-summary(heartmort)
-hist(log(heartmort$POPSIZE))
-```
-
-
 ```{r}
 hist(heartmort$POPSIZE)
 hist(heartmort$HDMORTPERPERSON)
-hist(heartmort$TOTHDMORT)
 hist(heartmort$POPDENSITY)
 hist(heartmort$HOUSINGUNITS)
 hist(heartmort$HOUSINGUNITDENSITY)
