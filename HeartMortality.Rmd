@@ -2,18 +2,17 @@
 Gathering Data:
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
-heartmort = heartmortCOMPLETE[-c(1:4)]
+heartmort = heartmortCOMPLETE[-c(1:4,24:26)]
 ```
 
 
 ```{r}
+heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30
 naivelm = lm(HDMORTPERPERSON ~ ., data = heartmort)
 summary(naivelm)
 ```
 
 ```{r}
-heartmort$PCTPOPOVER65 = 100 - heartmort$PCTPOP30TO65 - heartmort$PCTPOPUNDER30
-
 naivelm2 = lm(TOTHDMORT ~ ., data = heartmort)
 summary(naivelm2)
 ```
@@ -25,5 +24,35 @@ hist(log(heartmort$POPSIZE))
 apply(heartmort , 2, hist)
 names(dimnames(heartmort)) <- c("row", "col")
 ```
+
+
+```{r}
+hist(heartmort$POPSIZE)
+hist(heartmort$HDMORTPERPERSON)
+hist(heartmort$TOTHDMORT)
+hist(heartmort$POPDENSITY)
+hist(heartmort$HOUSINGUNITS)
+hist(heartmort$HOUSINGUNITDENSITY)
+hist(heartmort$AVGINCOMEPERPERSON)
+hist(heartmort$PCTDIABETES)
+hist(heartmort$PCTMALE)
+hist(heartmort$PCTFEMALE)
+hist(heartmort$PCTWHITE)
+hist(heartmort$PCTAFRAM)
+hist(heartmort$PCTASIANAM)
+hist(heartmort$PCTNATIVEAM)
+hist(heartmort$LOWEDUCATION)
+hist(heartmort$MEDEDUCATION)
+hist(heartmort$HIGHEDUCATION)
+hist(heartmort$TOTUNEMPLOYED)
+hist(heartmort$PCTUNEMPLOYED)
+hist(heartmort$PCTOBESE)
+hist(heartmort$PCTPOPUNDER65)
+```
+Variables that need to be transformed:
+
+POPSIZE
+
+
 
 
