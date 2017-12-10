@@ -50,10 +50,6 @@ hist(heartmort$PCTPOPUNDER65)
 
 hist(log(heartmort$POPSIZE))
 hist(log(heartmort$HDMORTPERPERSON))
-<<<<<<< HEAD
-
-=======
->>>>>>> 7597199f427433e3db3dc7ccb45445d2204351b2
 hist(log(heartmort$POPDENSITY))
 hist(log(heartmort$HOUSINGUNITS))
 hist(log(heartmort$HOUSINGUNITDENSITY))
