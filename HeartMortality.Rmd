@@ -50,7 +50,6 @@ hist(heartmort$PCTPOPUNDER65)
 
 hist(log(heartmort$POPSIZE))
 hist(log(heartmort$HDMORTPERPERSON))
-hist(log(heartmort$TOTHDMORT))
 hist(log(heartmort$POPDENSITY))
 hist(log(heartmort$HOUSINGUNITS))
 hist(log(heartmort$HOUSINGUNITDENSITY))
@@ -84,19 +83,18 @@ TOTUNEMPLOYED [log]
 PCTUNEMPLOYED [log]
 
 ```{r}
-theartmort = heartmort
-theartmort$POPSIZE = log(heartmort$POPSIZE)
-theartmort$HDMORTPERPERSON = log(heartmort$HDMORTPERPERSON)
-theartmort$TOTHDMORT = log(heartmort$TOTHDMORT)
-theartmort$POPDENSITY = log(heartmort$POPDENSITY)
-theartmort$HOUSINGUNITS = log(heartmort$HOUSINGUNITS)
-theartmort$HOUSINGUNITDENSITY = log(heartmort$HOUSINGUNITDENSITY)
-theartmort$AVGINCOMEPERPERSON = log(heartmort$AVGINCOMEPERPERSON)
-theartmort$TOTUNEMPLOYED = log(heartmort$TOTUNEMPLOYED)
-theartmort$PCTUNEMPLOYED = log(heartmort$PCTUNEMPLOYED)
+theartmort <- heartmort
+theartmort$POPSIZE <- log(heartmort$POPSIZE)
+theartmort$HDMORTPERPERSON <- log(heartmort$HDMORTPERPERSON + 1)
+theartmort$POPDENSITY <- log(heartmort$POPDENSITY + 1)
+theartmort$HOUSINGUNITS <- log(heartmort$HOUSINGUNITS + 1)
+theartmort$HOUSINGUNITDENSITY <- log(heartmort$HOUSINGUNITDENSITY + 1)
+theartmort$AVGINCOMEPERPERSON <- log(heartmort$AVGINCOMEPERPERSON + 1)
+theartmort$TOTUNEMPLOYED <- log(heartmort$TOTUNEMPLOYED + 1)
+theartmort$PCTUNEMPLOYED <- log(heartmort$PCTUNEMPLOYED + 1)
 ```
 
 ```{r}
 tlm = lm(HDMORTPERPERSON ~ ., data = theartmort)
-
+summary(tlm)
 ```
