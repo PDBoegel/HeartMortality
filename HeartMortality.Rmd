@@ -50,7 +50,7 @@ hist(heartmort$PCTPOPUNDER65)
 
 hist(log(heartmort$POPSIZE))
 hist(log(heartmort$HDMORTPERPERSON))
-hist(log(heartmort$TOTHDMORT))
+
 hist(log(heartmort$POPDENSITY))
 hist(log(heartmort$HOUSINGUNITS))
 hist(log(heartmort$HOUSINGUNITDENSITY))
