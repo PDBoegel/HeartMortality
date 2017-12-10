@@ -50,10 +50,6 @@ hist(heartmort$PCTPOPUNDER65)
 
 hist(log(heartmort$POPSIZE))
 hist(log(heartmort$HDMORTPERPERSON))
-<<<<<<< HEAD
-
-=======
->>>>>>> 7597199f427433e3db3dc7ccb45445d2204351b2
 hist(log(heartmort$POPDENSITY))
 hist(log(heartmort$HOUSINGUNITS))
 hist(log(heartmort$HOUSINGUNITDENSITY))
@@ -95,10 +91,29 @@ theartmort$HOUSINGUNITS <- log(heartmort$HOUSINGUNITS + 1)
 theartmort$HOUSINGUNITDENSITY <- log(heartmort$HOUSINGUNITDENSITY + 1)
 theartmort$AVGINCOMEPERPERSON <- log(heartmort$AVGINCOMEPERPERSON + 1)
 theartmort$TOTUNEMPLOYED <- log(heartmort$TOTUNEMPLOYED + 1)
-theartmort$PCTUNEMPLOYED <- log(heartmort$PCTUNEMPLOYED + 1)
 ```
 
 ```{r}
 tlm = lm(HDMORTPERPERSON ~ ., data = theartmort)
 summary(tlm)
+```
+
+```{r}
+newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65, data = theartmort)
+summary(newmodel)
+```
+
+```{r}
+for(i in 1:dim(theartmort)[1]){
+  theartmort$MALEDOM[i] <- 0
+  if(theartmort$PCTMALE[i] >= 50){
+    theartmort$MALEDOM[i] <- 1
+  }
+  
+}
+```
+
+```{r}
+newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65 + factor(MALEDOM), data = theartmort)
+summary(newmodel)
 ```
