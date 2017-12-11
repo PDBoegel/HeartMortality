@@ -131,6 +131,9 @@ summary(heartmort)
 
 ```
 
+
+
+#############################
 ```{r}
 resid = rstandard(tlm)
 leverage = hatvalues(tlm) 
@@ -154,9 +157,9 @@ length(which(leverage > 6*averagelev))
 ```
 
 ```{r}
-which(leverage > 6*averagelev)
-
-lev6heartmort = theartmort[-c(which(leverage > 6*averagelev))]
+levs <-as.numeric(which(leverage > 3*averagelev))
+levs
+lev6heartmort = theartmort[-levs,]
 lmlev6 = lm(HDMORTPERPERSON ~ ., data = lev6heartmort)
 summary(lmlev6)
 ```
@@ -175,11 +178,12 @@ averagelev = (k+1)/n
 hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
 
 
-
-
-
 ```
 
+### Notes ###
 
+Get rid of percents - multiply demographic percents by population in each county
+
+Eliminate high leverage points before transforming variables
 
 
