@@ -132,8 +132,8 @@ summary(heartmort)
 ```
 
 ```{r}
-resid = rstandard(newmodel)
-leverage = hatvalues(newmodel) 
+resid = rstandard(tlm)
+leverage = hatvalues(tlm) 
 
 hist(resid, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
 
