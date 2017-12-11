@@ -147,6 +147,8 @@ averagelev = (k+1)/n
 3*averagelev
 hist(leverage, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
 ```
+
+
 ```{r}
 which(leverage > 3*averagelev)
 length(which(leverage > 3*averagelev))
@@ -171,8 +173,8 @@ leveragelev6 = hatvalues(lmlev6)
 hist(residlev6, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
 
 
-k = dim(heartmortlev6)[2]
-n = dim(heartmortlev6)[1]
+k = dim(lev6heartmort)[2]
+n = dim(lev6heartmort)[1]
 averagelev = (k+1)/n
 3*averagelev
 hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
@@ -180,10 +182,59 @@ hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15
 
 ```
 
-### Notes ###
+### Notes ###########################
 
 Get rid of percents - multiply demographic percents by population in each county
 
 Eliminate high leverage points before transforming variables
 
+**Eliminating high lev points from nontransformed data**
+```{r}
+residnontrans = rstandard(naivelm)
+leveragenontrans = hatvalues(naivelm) 
+
+hist(resid, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
+
+
+k = dim(heartmort)[2]
+n = dim(heartmort)[1]
+averagelev = (k+1)/n
+3*averagelev
+hist(leveragenontrans, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
+```
+
+
+```{r}
+which(leveragenontrans > 3*averagelev)
+length(which(leveragenontrans > 3*averagelev))
+
+which(leveragenontrans > 6*averagelev)
+length(which(leveragenontrans > 6*averagelev))
+
+```
+
+```{r}
+levs2 <-as.numeric(which(leveragenontrans > 3*averagelev))
+levs2
+lev6heartmortnontrans = heartmort[-levs2,]
+lmlev6nontrans = lm(HDMORTPERPERSON ~ ., data = lev6heartmortnontrans)
+summary(lmlev6nontrans)
+```
+
+```{r}
+residlev6nontrans = rstandard(lmlev6nontrans)
+leveragelev6nontrans = hatvalues(lmlev6nontrans) 
+
+hist(residlev6nontrans, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
+
+
+k = dim(lev6heartmortnontrans)[2]
+n = dim(lev6heartmortnontrans)[1]
+averagelev = (k+1)/n
+3*averagelev
+hist(leveragelev6nontrans, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
+max(leveragelev6nontrans)
+
+
+```
 
