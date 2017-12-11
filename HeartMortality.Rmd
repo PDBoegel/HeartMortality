@@ -117,3 +117,45 @@ for(i in 1:dim(theartmort)[1]){
 newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65 + factor(MALEDOM), data = theartmort)
 summary(newmodel)
 ```
+
+
+```{r}
+
+summary(heartmort)
+
+
+
+
+
+
+
+```
+
+```{r}
+resid = rstandard(newmodel)
+leverage = hatvalues(newmodel) 
+
+hist(resid, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
+
+
+k = dim(heartmort)[2]
+n = dim(heartmort)[1]
+averagelev = (k+1)/n
+3*averagelev
+hist(leverage, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
+```
+```{r}
+which(leverage > 3*averagelev)
+length(which(leverage > 3*averagelev))
+
+which(leverage > 6*averagelev)
+length(which(leverage > 6*averagelev))
+
+```
+
+
+
+
+
+
+
