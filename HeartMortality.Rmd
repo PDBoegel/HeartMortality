@@ -153,8 +153,32 @@ length(which(leverage > 6*averagelev))
 
 ```
 
+```{r}
+which(leverage > 6*averagelev)
+
+lev6heartmort = theartmort[-c(which(leverage > 6*averagelev))]
+lmlev6 = lm(HDMORTPERPERSON ~ ., data = lev6heartmort)
+summary(lmlev6)
+```
+
+```{r}
+residlev6 = rstandard(lmlev6)
+leveragelev6 = hatvalues(lmlev6) 
+
+hist(residlev6, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
 
 
+k = dim(heartmortlev6)[2]
+n = dim(heartmortlev6)[1]
+averagelev = (k+1)/n
+3*averagelev
+hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
+
+
+
+
+
+```
 
 
 
