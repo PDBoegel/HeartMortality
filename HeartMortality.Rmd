@@ -35,6 +35,8 @@ All Percentage variables besides diabetes and obesity
 
 Notes: Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points, otherwise we add one so their log values are inf    
 ```{r, results='hide'}
+heartmortlog = heartmort
+
 heartmort$LNPOPSIZE <- log(heartmort$POPSIZE)
 heartmort$LNHDMORTPERPERSON <- log(heartmort$HDMORTPERPERSON)
 heartmort$LNPOPDENSITY <- log(heartmort$POPDENSITY)
@@ -52,7 +54,7 @@ summary(naivelm)
 ```
 
 ```{r}
-tlm = lm(HDMORTPERPERSON ~ ., data = heartmort)
+tlm = lm(HDMORTPERPERSON ~ ., data = heartmortlog)
 summary(tlm)
 ```
 
@@ -67,6 +69,7 @@ summary(newmodel)
 #summary(newmodel)
 ```
 
+**Sensitivity Analysis**
 ```{r}
 resid = rstandard(tlm)
 leverage = hatvalues(tlm) 
@@ -114,6 +117,20 @@ hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15
 
 
 ```
+
+```{r}
+quantile(heartmort$PCTAFRAM,probs = 0.95)
+quantile(heartmort$PCTASIANAM,probs = 0.95)
+quantile(heartmort$PCTNATIVEAM,probs = 0.95)
+quantile(heartmort$PCTWHITE,probs = 0.95)
+
+heartmort$MALEDOM = factor(heartmort$PCTMALE, levels = c(0:0.50,0.500001:1), labels = c("Majority Male", "Majority Female"))
+
+
+ 
+```
+
+
 
 ### Notes ###########################
 
