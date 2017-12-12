@@ -46,10 +46,9 @@ All Percentage variables besides diabetes and obesity
 
 Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points    
 ```{r, results='hide'}
-<<<<<<< HEAD
 # We log totals imeediately as popsize varies widely from county to county
-totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNTOTASIANAM","LNTOTNONELDERLY")
-heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[10:19])
+totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNAFRAM","LNTOTASIANAM","LNNATIVEAM","LNTOTUNEMPLOYED","LNTOTNONELDERLY")
+heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[7:19])
 
 # Making categories for PCT variables
 
@@ -58,28 +57,6 @@ heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[10:19])
 logCols <- c("LNPOPSIZE","LNHDMORTPERPERSON","LNPOPDENSITY","LNHOUSINGUNITS","LNHOUSINGUNITSDENSITY","LNAVGINCOMEPERPERSON")
 heartmort[logCols] <- log(heartmort[1:6])
 
-=======
-heartmortlog = heartmort
-
-heartmort$LNPOPSIZE <- log(heartmort$POPSIZE)
-heartmort$LNHDMORTPERPERSON <- log(heartmort$HDMORTPERPERSON)
-heartmort$LNPOPDENSITY <- log(heartmort$POPDENSITY)
-heartmort$LNHOUSINGUNITS <- log(heartmort$HOUSINGUNITS)
-heartmort$LNHOUSINGUNITDENSITY <- log(heartmort$HOUSINGUNITDENSITY)
-heartmort$LNAVGINCOMEPERPERSON <- log(heartmort$AVGINCOMEPERPERSON + 1)
-heartmort$LNTOTUNEMPLOYED <- log(heartmort$TOTUNEMPLOYED)
-
-heartmort$TOTDIABETES <- (log(heartmort$POPSIZE * (heartmort$PCTDIABETES/100)))
-heartmort$TOTMALE <- (log(heartmort$POPSIZE * (heartmort$PCTMALE/100)))
-heartmort$TOTFEMALE <- (log(heartmort$POPSIZE * (heartmort$PCTFEMALE/100)))
-heartmort$TOTWHITE <- (log(heartmort$POPSIZE * (heartmort$PCTWHITE/100)))
-heartmort$TOTASIANAM <- (log(heartmort$POPSIZE * (heartmort$PCTASIANAM/100)))
-heartmort$TOTNATIVEAM <- (log(heartmort$POPSIZE * (heartmort$PCTNATIVEAM/100)))
-heartmort$TOTLOWEDU <- (log(heartmort$POPSIZE * (heartmort$LOWEDUCATION/100)))
-heartmort$TOTMEDEDU <- (log(heartmort$POPSIZE * (heartmort$MEDEDUCATION/100)))
-heartmort$TOTHIGHEDU <- (log(heartmort$POPSIZE * (heartmort$HIGHEDUCATION/100)))
-heartmort$TOTNONELDERLY <- (log(heartmort$POPSIZE * (heartmort$PCTPOPUNDER65/100)))
->>>>>>> 644dbb61a5d71eadd146eb15e3bf2a8667a66df7
 par(mfrow = c(2,3))
 lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
@@ -91,14 +68,13 @@ naivelm = lm(LNHDMORTPERPERSON ~ LNPOPSIZE + LNHOUSINGUNITS + LNAVGINCOMEPERPERS
 summary(naivelm)
 ```
 
-<<<<<<< HEAD
 ```{r}
-tlm = lm(HDMORTPERPERSON ~ ., data = heartmortlog)
+tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
+summary(heartmort)
 ```
 
 ```{r, eval = FALSE}
 tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
->>>>>>> 229dfc644298272343dc2c203f18f75de34f1f2c
 summary(tlm)
 ```
 
@@ -117,7 +93,6 @@ summary(newmodel)
 **Sensitivity Analysis**
 
 ```{r, eval = FALSE}
->>>>>>> 229dfc644298272343dc2c203f18f75de34f1f2c
 resid = rstandard(tlm)
 leverage = hatvalues(tlm) 
 
