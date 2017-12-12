@@ -1,17 +1,10 @@
-```{r, echo = FALSE}
-#Functions used throughout document
-makeHistograms <- function(df) {
-  
-  
-}
-
-```
-Libraries used throughout project:
-```{r}
-library(reshape2)
-library(ggplot2)
-library(Hmisc)
-```
+---
+title: 
+author: 
+date: 
+output: html_document
+css: report_styles.css
+---
 Gathering Data:
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
@@ -19,117 +12,62 @@ heartmort = heartmortCOMPLETE[-c(1:4,7,24:26)] #Getting rid of variables for met
 ```
 
 # Naive linear model for insights
-
 ```{r}
-heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30
-naivelm = lm(HDMORTPERPERSON ~ ., data = heartmort)
-summary(naivelm)
+heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30 # To account for elderly population
+summary(heartmort)
 ```
-
-
 ```{r, results='hide'}
 par(mfrow = c(2,3))
 lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
-# hist(heartmort$POPSIZE)
-# hist(heartmort$HDMORTPERPERSON)
-# hist(heartmort$POPDENSITY)
-# hist(heartmort$HOUSINGUNITS)
-# hist(heartmort$HOUSINGUNITDENSITY)
-# hist(heartmort$AVGINCOMEPERPERSON)
-# hist(heartmort$PCTDIABETES)
-# hist(heartmort$PCTMALE)
-# hist(heartmort$PCTFEMALE)
-# hist(heartmort$PCTWHITE)
-# hist(heartmort$PCTAFRAM)
-# hist(heartmort$PCTASIANAM)
-# hist(heartmort$PCTNATIVEAM)
-# hist(heartmort$LOWEDUCATION)
-# hist(heartmort$MEDEDUCATION)
-# hist(heartmort$HIGHEDUCATION)
-# hist(heartmort$TOTUNEMPLOYED)
-# hist(heartmort$PCTUNEMPLOYED)
-# hist(heartmort$PCTOBESE)
-# hist(heartmort$PCTPOPUNDER65)
 ```
+From looking at the summary and histograms of the Variables, those that need to be transformed are:
 
-
-```{r}
-hist(log(heartmort$POPSIZE))
-hist(log(heartmort$HDMORTPERPERSON))
-hist(log(heartmort$POPDENSITY))
-hist(log(heartmort$HOUSINGUNITS))
-hist(log(heartmort$HOUSINGUNITDENSITY))
-hist(log(heartmort$AVGINCOMEPERPERSON))
-hist(log(heartmort$LOWEDUCATION))
-hist(log(heartmort$MEDEDUCATION))
-hist(log(heartmort$HIGHEDUCATION))
-hist(log(heartmort$TOTUNEMPLOYED))
-```
-Variables that need to be transformed:
-
+Log transform:
 POPSIZE [log]
 HDMORTPERPERSON [log]
-TOTHDMORT [log]
 POPDENSITY [log]
 HOUSINGUNITS [log]
 HOUSINGUNITDENSITY [log]
 AVGINCOMEPERPERSON [log]
-
 TOTUNEMPLOYED [log]
-PCTUNEMPLOYED [log]
 
-```{r}
-theartmort <- heartmort
-theartmort$POPSIZE <- log(heartmort$POPSIZE)
-theartmort$HDMORTPERPERSON <- log(heartmort$HDMORTPERPERSON + 1)
-theartmort$POPDENSITY <- log(heartmort$POPDENSITY + 1)
-theartmort$HOUSINGUNITS <- log(heartmort$HOUSINGUNITS + 1)
-theartmort$HOUSINGUNITDENSITY <- log(heartmort$HOUSINGUNITDENSITY + 1)
-theartmort$AVGINCOMEPERPERSON <- log(heartmort$AVGINCOMEPERPERSON + 1)
-theartmort$TOTUNEMPLOYED <- log(heartmort$TOTUNEMPLOYED + 1)
+categorized:
+All Percentage variables besides diabetes and obesity
+
+Notes: Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points, otherwise we add one so their log values are inf    
+```{r, results='hide'}
+heartmort$LNPOPSIZE <- log(heartmort$POPSIZE)
+heartmort$LNHDMORTPERPERSON <- log(heartmort$HDMORTPERPERSON)
+heartmort$LNPOPDENSITY <- log(heartmort$POPDENSITY)
+heartmort$LNHOUSINGUNITS <- log(heartmort$HOUSINGUNITS)
+heartmort$LNHOUSINGUNITDENSITY <- log(heartmort$HOUSINGUNITDENSITY)
+heartmort$LNAVGINCOMEPERPERSON <- log(heartmort$AVGINCOMEPERPERSON + 1)
+heartmort$LNTOTUNEMPLOYED <- log(heartmort$TOTUNEMPLOYED)
+par(mfrow = c(2,3))
+lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
 
 ```{r}
-tlm = lm(HDMORTPERPERSON ~ ., data = theartmort)
+naivelm = lm(HDMORTPERPERSON ~ ., data = heartmort)
+summary(naivelm)
+```
+
+```{r}
+tlm = lm(HDMORTPERPERSON ~ ., data = heartmort)
 summary(tlm)
 ```
 
 ```{r}
-newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65, data = theartmort)
-summary(newmodel)
-```
-
-```{r}
-for(i in 1:dim(theartmort)[1]){
-  theartmort$MALEDOM[i] <- 0
-  if(theartmort$PCTMALE[i] >= 50){
-    theartmort$MALEDOM[i] <- 1
-  }
-  
-}
-```
-
-```{r}
-newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65 + factor(MALEDOM), data = theartmort)
+newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65, data = heartmort)
 summary(newmodel)
 ```
 
 
 ```{r}
-
-summary(heartmort)
-
-
-
-
-
-
-
+#newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65 + factor(MALEDOM), data = heartmort)
+#summary(newmodel)
 ```
 
-
-
-#############################
 ```{r}
 resid = rstandard(tlm)
 leverage = hatvalues(tlm) 
@@ -157,7 +95,7 @@ length(which(leverage > 6*averagelev))
 ```{r}
 levs <-as.numeric(which(leverage > 3*averagelev))
 levs
-lev6heartmort = theartmort[-levs,]
+lev6heartmort = heartmort[-levs,]
 lmlev6 = lm(HDMORTPERPERSON ~ ., data = lev6heartmort)
 summary(lmlev6)
 ```
