@@ -8,17 +8,21 @@ Gathering Data:
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
 heartmort = heartmortCOMPLETE[-c(1:4,7,24:26)] #Getting rid of variables for metadata and other dependent variable
+
 ```
 
-# Naive linear model for insights
+# Basic data manipulation to better fit normality assumptions for linear models
+
 ```{r}
 heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30 # To account for elderly population
+heartmort <- subset(heartmort, AVGINCOMEPERPERSON > 0)
 summary(heartmort)
 ```
 ```{r, results='hide'}
 par(mfrow = c(2,3))
 lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
+
 From looking at the summary and histograms of the Variables, those that need to be transformed are:
 
 Log transform:
@@ -42,32 +46,45 @@ heartmort$LNHOUSINGUNITS <- log(heartmort$HOUSINGUNITS)
 heartmort$LNHOUSINGUNITDENSITY <- log(heartmort$HOUSINGUNITDENSITY)
 heartmort$LNAVGINCOMEPERPERSON <- log(heartmort$AVGINCOMEPERPERSON + 1)
 heartmort$LNTOTUNEMPLOYED <- log(heartmort$TOTUNEMPLOYED)
+
+heartmort$TOTDIABETES <- (log(heartmort$POPSIZE * (heartmort$PCTDIABETES/100)))
+heartmort$TOTMALE <- (log(heartmort$POPSIZE * (heartmort$PCTMALE/100)))
+heartmort$TOTFEMALE <- (log(heartmort$POPSIZE * (heartmort$PCTFEMALE/100)))
+heartmort$TOTWHITE <- (log(heartmort$POPSIZE * (heartmort$PCTWHITE/100)))
+heartmort$TOTASIANAM <- (log(heartmort$POPSIZE * (heartmort$PCTASIANAM/100)))
+heartmort$TOTNATIVEAM <- (log(heartmort$POPSIZE * (heartmort$PCTNATIVEAM/100)))
+heartmort$TOTLOWEDU <- (log(heartmort$POPSIZE * (heartmort$LOWEDUCATION/100)))
+heartmort$TOTMEDEDU <- (log(heartmort$POPSIZE * (heartmort$MEDEDUCATION/100)))
+heartmort$TOTHIGHEDU <- (log(heartmort$POPSIZE * (heartmort$HIGHEDUCATION/100)))
+heartmort$TOTNONELDERLY <- (log(heartmort$POPSIZE * (heartmort$PCTPOPUNDER65/100)))
 par(mfrow = c(2,3))
 lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
 
+# Basic linear models
+
 ```{r}
-naivelm = lm(HDMORTPERPERSON ~ ., data = heartmort)
+naivelm = lm(LNHDMORTPERPERSON ~ LNPOPSIZE + LNHOUSINGUNITS + LNAVGINCOMEPERPERSON , data = heartmort)
 summary(naivelm)
 ```
 
-```{r}
-tlm = lm(HDMORTPERPERSON ~ ., data = heartmort)
+```{r, eval = FALSE}
+tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
 summary(tlm)
 ```
 
-```{r}
+```{r, eval = FALSE}
 newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65, data = heartmort)
 summary(newmodel)
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 #newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65 + factor(MALEDOM), data = heartmort)
 #summary(newmodel)
 ```
 
-```{r}
+```{r, eval = FALSE}
 resid = rstandard(tlm)
 leverage = hatvalues(tlm) 
 
@@ -82,7 +99,7 @@ hist(leverage, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 which(leverage > 3*averagelev)
 length(which(leverage > 3*averagelev))
 
@@ -91,7 +108,7 @@ length(which(leverage > 6*averagelev))
 
 ```
 
-```{r}
+```{r, eval = FALSE}
 levs <-as.numeric(which(leverage > 3*averagelev))
 levs
 lev6heartmort = heartmort[-levs,]
@@ -99,7 +116,7 @@ lmlev6 = lm(HDMORTPERPERSON ~ ., data = lev6heartmort)
 summary(lmlev6)
 ```
 
-```{r}
+```{r, eval = FALSE}
 residlev6 = rstandard(lmlev6)
 leveragelev6 = hatvalues(lmlev6) 
 
@@ -122,7 +139,7 @@ Get rid of percents - multiply demographic percents by population in each county
 Eliminate high leverage points before transforming variables
 
 **Eliminating high lev points from nontransformed data**
-```{r}
+```{r, eval = FALSE}
 residnontrans = rstandard(naivelm)
 leveragenontrans = hatvalues(naivelm) 
 
@@ -137,7 +154,7 @@ hist(leveragenontrans, main="Histogram of Leverages", xlab = "Leverage", breaks 
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 which(leveragenontrans > 3*averagelev)
 length(which(leveragenontrans > 3*averagelev))
 
@@ -146,7 +163,7 @@ length(which(leveragenontrans > 6*averagelev))
 
 ```
 
-```{r}
+```{r, eval=FALSE}
 levs2 <-as.numeric(which(leveragenontrans > 3*averagelev))
 levs2
 lev6heartmortnontrans = heartmort[-levs2,]
@@ -154,7 +171,7 @@ lmlev6nontrans = lm(HDMORTPERPERSON ~ ., data = lev6heartmortnontrans)
 summary(lmlev6nontrans)
 ```
 
-```{r}
+```{r, eval = FALSE}
 residlev6nontrans = rstandard(lmlev6nontrans)
 leveragelev6nontrans = hatvalues(lmlev6nontrans) 
 
