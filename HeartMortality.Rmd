@@ -3,7 +3,6 @@ title:
 author: 
 date: 
 output: html_document
-css: report_styles.css
 ---
 Gathering Data:
 ```{r}
