@@ -8,17 +8,21 @@ Gathering Data:
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
 heartmort = heartmortCOMPLETE[-c(1:4,7,24:26)] #Getting rid of variables for metadata and other dependent variable
+
 ```
 
-# Naive linear model for insights
+# Basic data manipulation to better fit normality assumptions for linear models
+
 ```{r}
 heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30 # To account for elderly population
+heartmort <- subset(heartmort, AVGINCOMEPERPERSON > 0)
 summary(heartmort)
 ```
 ```{r, results='hide'}
 par(mfrow = c(2,3))
 lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
+
 From looking at the summary and histograms of the Variables, those that need to be transformed are:
 
 Log transform:
@@ -44,33 +48,55 @@ heartmort$LNHOUSINGUNITS <- log(heartmort$HOUSINGUNITS)
 heartmort$LNHOUSINGUNITDENSITY <- log(heartmort$HOUSINGUNITDENSITY)
 heartmort$LNAVGINCOMEPERPERSON <- log(heartmort$AVGINCOMEPERPERSON + 1)
 heartmort$LNTOTUNEMPLOYED <- log(heartmort$TOTUNEMPLOYED)
+
+heartmort$TOTDIABETES <- (log(heartmort$POPSIZE * (heartmort$PCTDIABETES/100)))
+heartmort$TOTMALE <- (log(heartmort$POPSIZE * (heartmort$PCTMALE/100)))
+heartmort$TOTFEMALE <- (log(heartmort$POPSIZE * (heartmort$PCTFEMALE/100)))
+heartmort$TOTWHITE <- (log(heartmort$POPSIZE * (heartmort$PCTWHITE/100)))
+heartmort$TOTASIANAM <- (log(heartmort$POPSIZE * (heartmort$PCTASIANAM/100)))
+heartmort$TOTNATIVEAM <- (log(heartmort$POPSIZE * (heartmort$PCTNATIVEAM/100)))
+heartmort$TOTLOWEDU <- (log(heartmort$POPSIZE * (heartmort$LOWEDUCATION/100)))
+heartmort$TOTMEDEDU <- (log(heartmort$POPSIZE * (heartmort$MEDEDUCATION/100)))
+heartmort$TOTHIGHEDU <- (log(heartmort$POPSIZE * (heartmort$HIGHEDUCATION/100)))
+heartmort$TOTNONELDERLY <- (log(heartmort$POPSIZE * (heartmort$PCTPOPUNDER65/100)))
 par(mfrow = c(2,3))
 lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
 
+# Basic linear models
+
 ```{r}
-naivelm = lm(HDMORTPERPERSON ~ ., data = heartmort)
+naivelm = lm(LNHDMORTPERPERSON ~ LNPOPSIZE + LNHOUSINGUNITS + LNAVGINCOMEPERPERSON , data = heartmort)
 summary(naivelm)
 ```
 
+<<<<<<< HEAD
 ```{r}
 tlm = lm(HDMORTPERPERSON ~ ., data = heartmortlog)
+```
+
+```{r, eval = FALSE}
+tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
+>>>>>>> 229dfc644298272343dc2c203f18f75de34f1f2c
 summary(tlm)
 ```
 
-```{r}
+```{r, eval = FALSE}
 newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65, data = heartmort)
 summary(newmodel)
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 #newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65 + factor(MALEDOM), data = heartmort)
 #summary(newmodel)
 ```
 
+
 **Sensitivity Analysis**
-```{r}
+
+```{r, eval = FALSE}
+>>>>>>> 229dfc644298272343dc2c203f18f75de34f1f2c
 resid = rstandard(tlm)
 leverage = hatvalues(tlm) 
 
@@ -85,7 +111,7 @@ hist(leverage, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
 ```
 
 
-```{r}
+```{r, eval = FALSE}
 which(leverage > 3*averagelev)
 length(which(leverage > 3*averagelev))
 
@@ -94,7 +120,7 @@ length(which(leverage > 6*averagelev))
 
 ```
 
-```{r}
+```{r, eval = FALSE}
 levs <-as.numeric(which(leverage > 3*averagelev))
 levs
 lev6heartmort = heartmort[-levs,]
@@ -102,7 +128,7 @@ lmlev6 = lm(HDMORTPERPERSON ~ ., data = lev6heartmort)
 summary(lmlev6)
 ```
 
-```{r}
+```{r, eval = FALSE}
 residlev6 = rstandard(lmlev6)
 leveragelev6 = hatvalues(lmlev6) 
 
@@ -124,13 +150,9 @@ quantile(heartmort$PCTASIANAM,probs = 0.95)
 quantile(heartmort$PCTNATIVEAM,probs = 0.95)
 quantile(heartmort$PCTWHITE,probs = 0.95)
 
-heartmort$MALEDOM = factor(heartmort$PCTMALE, levels = c(0:0.50,0.500001:1), labels = c("Majority Male", "Majority Female"))
+heartmort$MALEDOM = factor(heartmort$PCTMALE , levels = c(0:0.5000,0.5001:1), labels = c("Majority Female","Majority Male" ))
 
-
- 
 ```
-
-
 
 ### Notes ###########################
 
