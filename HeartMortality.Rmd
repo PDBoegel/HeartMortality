@@ -25,9 +25,10 @@ heartmort <- heartmort[,c(1:6,14:16,19,7:13,18,20)] #Organization to make catego
 heartmort[,c(7:19)] <- heartmort[,c(7:19)]/100 # Making percents into numbers [0,1]
 ```
 
-```{r, results='hide'}
-par(mfrow = c(2,3))
-lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
+```{r, results='hide', echo=FALSE}
+# Put These into the appendix
+# par(mfrow = c(2,3))
+# lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
 
 From looking at the summary and histograms of the Variables, those that need to be transformed are:
@@ -63,42 +64,28 @@ heartmort[logCols] <- log(heartmort[1:6])
 par(mfrow = c(2,3))
 ```
 
-```{r}
+```{r, results='hide', echo=FALSE}
+# Put these into the appendix
 # par(mfrow = c(2,3))
 # lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
 ```
 
-# Basic linear models
+**linear model analysis**
 
 ```{r}
-naivelm = lm(LNHDMORTPERPERSON ~ LNPOPSIZE + LNHOUSINGUNITS + LNAVGINCOMEPERPERSON , data = heartmort)
-summary(naivelm)
+totlm = lm(LNHDMORTPERPERSON ~ 1, data = heartmort)
+summary(totlm)
 ```
 
 ```{r}
-tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
+catlm = lm(LNHDMORTPERPERSON ~ 1, data = heartmort)
+summary(catlm)
 ```
 
-```{r, eval = FALSE}
-tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
-summary(tlm)
-```
+**Sensitivity Analysis** 
 
 ```{r, eval = FALSE}
-newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65, data = heartmort)
-summary(newmodel)
-```
-
-
-```{r, eval = FALSE}
-#newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65 + factor(MALEDOM), data = heartmort)
-#summary(newmodel)
-```
-
-
-**Sensitivity Analysis**
-
-```{r, eval = FALSE}
+#CHANGE tlm BASE UPON WHICH MODEL CHOSEN FROM ABOVE
 resid = rstandard(tlm)
 leverage = hatvalues(tlm) 
 
@@ -144,36 +131,6 @@ averagelev = (k+1)/n
 hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
 ```
 *End sensitivity analysis*
-
-*Demographic quantiles*
-```{r}
-quantile(heartmort$PCTAFRAM,probs = 0.95)
-quantile(heartmort$PCTASIANAM,probs = 0.95)
-quantile(heartmort$PCTNATIVEAM,probs = 0.95)
-quantile(heartmort$PCTWHITE,probs = 0.95)
-
-
-heartmort$MALEDOM = cut(heartmort$PCTMALE,breaks = c(0  , 50 , 100.1) , labels = c("0","1"))
-
-heartmort$SIGNIFICANTAFRAM = cut(heartmort$PCTAFRAM,breaks = c(0  , quantile(heartmort$PCTAFRAM,probs = 0.95) , 100.1) , labels = c("0","1"))
-
-heartmort$SIGNIFICANTASIANAM = cut(heartmort$PCTASIANAM,breaks = c(0  , quantile(heartmort$PCTASIANAM,probs = 0.95) , 100.1) , labels = c("0","1"))
-
-heartmort$SIGNIFICANTNATIVEAM = cut(heartmort$PCTNATIVEAM,breaks = c(0  , quantile(heartmort$PCTNATIVEAM,probs = 0.95) , 100.1) , labels = c("0","1"))
-
-heartmort$SIGNIFICANTWHITE = cut(heartmort$PCTWHITE,breaks = c(0  , quantile(heartmort$PCTWHITE,probs = 0.95) , 100.1) , labels = c("0","1"))
-
-factor(heartmort$PCTMALE , levels = c("0","1"), labels = c("Majority Female","Majority Male" )) # Doesnt work
-```
-
-
-```{r}
-tranheartmort = heartmort
-
-
-
-
-```
 
 ### Notes ############################
 
