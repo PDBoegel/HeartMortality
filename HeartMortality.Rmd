@@ -155,7 +155,7 @@ factor(heartmort$PCTMALE , levels = c("0","1"), labels = c("Majority Female","Ma
 
 
 ```{r}
-tranheartmort = heartmort
+
 
 
 
