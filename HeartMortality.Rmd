@@ -173,7 +173,7 @@ tranheartmort = heartmort
 
 ```
 
-### Notes ###########################
+### Notes ############################
 
 Get rid of percents - multiply demographic percents by population in each county
 
