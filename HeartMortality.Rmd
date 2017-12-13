@@ -8,7 +8,6 @@ Gathering Data:
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
 heartmort = heartmortCOMPLETE[-c(1:4,7,24:26)] #Getting rid of variables for metadata and other dependent variable
-
 ```
 
 # Basic data manipulation to better fit normality assumptions for linear models
@@ -42,25 +41,16 @@ All Percentage variables besides diabetes and obesity
 
 Notes: Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points, otherwise we add one so their log values are inf    
 ```{r, results='hide'}
+# We log totals imeediately as popsize varies widely from county to county
+totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNTOTASIANAM","LNTOTNONELDERLY")
+heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[10:19])
 
-heartmort$LNPOPSIZE <- log(heartmort$POPSIZE)
-heartmort$LNHDMORTPERPERSON <- log(heartmort$HDMORTPERPERSON)
-heartmort$LNPOPDENSITY <- log(heartmort$POPDENSITY)
-heartmort$LNHOUSINGUNITS <- log(heartmort$HOUSINGUNITS)
-heartmort$LNHOUSINGUNITDENSITY <- log(heartmort$HOUSINGUNITDENSITY)
-heartmort$LNAVGINCOMEPERPERSON <- log(heartmort$AVGINCOMEPERPERSON + 1)
-heartmort$LNTOTUNEMPLOYED <- log(heartmort$TOTUNEMPLOYED)
+# Making categories for PCT variables
 
-heartmort$TOTDIABETES <- (log(heartmort$POPSIZE * (heartmort$PCTDIABETES/100)))
-heartmort$TOTMALE <- (log(heartmort$POPSIZE * (heartmort$PCTMALE/100)))
-heartmort$TOTFEMALE <- (log(heartmort$POPSIZE * (heartmort$PCTFEMALE/100)))
-heartmort$TOTWHITE <- (log(heartmort$POPSIZE * (heartmort$PCTWHITE/100)))
-heartmort$TOTASIANAM <- (log(heartmort$POPSIZE * (heartmort$PCTASIANAM/100)))
-heartmort$TOTNATIVEAM <- (log(heartmort$POPSIZE * (heartmort$PCTNATIVEAM/100)))
-heartmort$TOTLOWEDU <- (log(heartmort$POPSIZE * (heartmort$LOWEDUCATION/100)))
-heartmort$TOTMEDEDU <- (log(heartmort$POPSIZE * (heartmort$MEDEDUCATION/100)))
-heartmort$TOTHIGHEDU <- (log(heartmort$POPSIZE * (heartmort$HIGHEDUCATION/100)))
-heartmort$TOTNONELDERLY <- (log(heartmort$POPSIZE * (heartmort$PCTPOPUNDER65/100)))
+
+# Log transformations from what was specified above
+logCols <- c("LNPOPSIZE","LNHDMORTPERPERSON","LNPOPDENSITY","LNHOUSINGUNITS","LNHOUSINGUNITSDENSITY","LNAVGINCOMEPERPERSON")
+heartmort[logCols] <- log(heartmort[1:6])
 par(mfrow = c(2,3))
 lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
@@ -72,9 +62,8 @@ naivelm = lm(LNHDMORTPERPERSON ~ LNPOPSIZE + LNHOUSINGUNITS + LNAVGINCOMEPERPERS
 summary(naivelm)
 ```
 
-
 ```{r}
-tlm = lm(HDMORTPERPERSON ~ ., data = heartmortlog)
+tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
 ```
 
 ```{r, eval = FALSE}
