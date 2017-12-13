@@ -80,7 +80,11 @@ cor(heartmort[20:24])
 cor(heartmort[25:30])
 
 #Table of correlations : Population, Housing, Income
+<<<<<<< HEAD
 #cor(heartmort[c(46,48,49,50,51)])
+=======
+cor(heartmort[c(46,48,49,50,51)])
+>>>>>>> 696859a39a5b196a74bd23788e768f6e212d52c5
 ```
 
 **Table of Correlations: Using PCT**
@@ -92,7 +96,11 @@ cor(heartmort[20:24])
 cor(heartmort[25:30])
 
 #Table of correlations : Population, Housing, Income
+<<<<<<< HEAD
 #cor(heartmort[c(46,48,49,50,51)])
+=======
+cor(heartmort[c(46,48,49,50,51)])
+>>>>>>> 696859a39a5b196a74bd23788e768f6e212d52c5
 
 
 
@@ -190,3 +198,7 @@ hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15
 Get rid of percents - multiply demographic percents by population in each county
 
 Eliminate high leverage points before transforming variables
+<<<<<<< HEAD
+=======
+
+>>>>>>> 696859a39a5b196a74bd23788e768f6e212d52c5
