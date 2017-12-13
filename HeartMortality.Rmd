@@ -8,17 +8,22 @@ Gathering Data:
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
 heartmort = heartmortCOMPLETE[-c(1:4,7,24:26)] #Getting rid of variables for metadata and other dependent variable
+options(max.print = 4000)
 ```
 
 # Basic data manipulation to better fit normality assumptions for linear models
 
 ```{r}
 heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30 # To account for elderly population
-heartmort <- subset(heartmort, AVGINCOMEPERPERSON > 0)
-summary(heartmort)
+heartmort <- subset(heartmort, AVGINCOMEPERPERSON > 0 & PCTASIANAM != 0 & PCTAFRAM != 0 & PCTNATIVEAM != 0) # 26 counties had 0 avgincome/PCTAFRAM/PCTNATIVEAM/PCTASAINAM, removal should not affect study and makes histogram/log transform variables easier to make/use later
+summaryOfVars <- summary(heartmort)
+summaryOfVars
 ```
-**Removed 3 observations due to avg inc / person = 0**
+```{r, echo=FALSE}
+heartmort <- heartmort[,c(1:6,14:16,19,7:13,18,20)] #Organization to make category variables easier later on. Does not need to go into document
 
+heartmort[,c(7:19)] <- heartmort[,c(7:19)]/100 # Making percents into numbers [0,1]
+```
 
 ```{r, results='hide'}
 par(mfrow = c(2,3))
@@ -42,17 +47,25 @@ All Percentage variables besides diabetes and obesity
 Notes: Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points, otherwise we add one so their log values are inf    
 ```{r, results='hide'}
 # We log totals imeediately as popsize varies widely from county to county
-totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNTOTASIANAM","LNTOTNONELDERLY")
-heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[10:19])
+totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNTOTAFRAM","LNTOTASIANAM","LNTOTNATIVEAM","LNTOTUNEMPLOYED","LNTOTNONELDERLY")
+heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[7:19])
 
 # Making categories for PCT variables
+catCols <- c("CATLOWEDU","CATMEDEDU","CATHIGHEDU","CATOBESE","CATDIABETES","CATMALE","CATFEMALE","CATWHITE","CATAFRAM","CATASIANAM","CATNATIVEAM","CATUNEMPLOYED","CATNONELDERLY")
+heartmort[catCols] <- 0
+df <- lapply(7:19, function(i) cut(heartmort[,i], c(-.01, max(0, as.numeric(quantile(heartmort[,i], probs = 0.5)) - (1.5 * (as.numeric(quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i],probs = 0.25))))), min(1, as.numeric(quantile(heartmort[,i], probs = 0.5)) + (1.5 * as.numeric((quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i], probs = 0.25))))),1.01), right = FALSE, labels = c(0:2)))
 
-
+heartmort[33:45] <- df
+colnames(heartmort)[33:45] <- catCols
 # Log transformations from what was specified above
 logCols <- c("LNPOPSIZE","LNHDMORTPERPERSON","LNPOPDENSITY","LNHOUSINGUNITS","LNHOUSINGUNITSDENSITY","LNAVGINCOMEPERPERSON")
 heartmort[logCols] <- log(heartmort[1:6])
 par(mfrow = c(2,3))
-lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
+```
+
+```{r}
+# par(mfrow = c(2,3))
+# lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
 ```
 
 # Basic linear models
