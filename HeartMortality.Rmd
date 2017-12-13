@@ -52,11 +52,11 @@ totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABE
 heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[7:19])
 
 # Making categories for PCT variables
-catCols <- c("CATLOWEDU","CATMEDEDU","CATHIGHEDU","CATOBESE","CATDIABETES","CATMALE","CATFEMALE","CATWHITE","CATAFRAM","CATASIANAM","CATNATIVEAM","CATUNEMPLOYED","CATNONELDERLY")
+catCols <- c("CATHDMORTPERPERSON","CATLOWEDU","CATMEDEDU","CATHIGHEDU","CATOBESE","CATDIABETES","CATMALE","CATFEMALE","CATWHITE","CATAFRAM","CATASIANAM","CATNATIVEAM","CATUNEMPLOYED","CATNONELDERLY")
 heartmort[catCols] <- 0
-df <- lapply(7:19, function(i) cut(heartmort[,i], c(-.01, max(0, as.numeric(quantile(heartmort[,i], probs = 0.5)) - (1.5 * (as.numeric(quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i],probs = 0.25))))), min(1, as.numeric(quantile(heartmort[,i], probs = 0.5)) + (1.5 * as.numeric((quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i], probs = 0.25))))),1.01), right = FALSE, labels = c(0:2)))
+df <- lapply(c(2,7:19), function(i) cut(heartmort[,i], c(-.01, max(0, as.numeric(quantile(heartmort[,i], probs = 0.25)) - (1.5 * (as.numeric(quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i],probs = 0.25))))), min(1, as.numeric(quantile(heartmort[,i], probs = 0.75)) + (1.5 * as.numeric((quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i], probs = 0.25))))),1.01), right = FALSE, labels = c(0:2)))
 
-heartmort[33:45] <- df
+heartmort[33:46] <- df
 colnames(heartmort)[33:45] <- catCols
 # Log transformations from what was specified above
 logCols <- c("LNPOPSIZE","LNHDMORTPERPERSON","LNPOPDENSITY","LNHOUSINGUNITS","LNHOUSINGUNITSDENSITY","LNAVGINCOMEPERPERSON")
@@ -70,7 +70,7 @@ par(mfrow = c(2,3))
 # lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
 ```
 
-<<<<<<< HEAD
+
 **Table of Correlations:**
 ```{r}
 #Table of correlations : EDUCATION LEVEL AND OBESITY/DIABETES RATES
@@ -80,13 +80,9 @@ cor(heartmort[20:24])
 cor(heartmort[25:30])
 
 #Table of correlations : Population, Housing, Income
-cor(heartmort[c(46,48:51)])
+# cor(heartmort[c(46,48:51)])
 ```
 
-
-
-=======
->>>>>>> 979c3b31bd5b946dd57bfdf7c19b573a08f9043c
 **linear model analysis**
 
 ```{r}
