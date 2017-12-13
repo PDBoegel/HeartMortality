@@ -82,6 +82,7 @@ cor(heartmort[25:30])
 
 #Table of correlations : Population, Housing, Income
 cor(heartmort[c(47,49:52)])
+
 ```
 
 **Table of Correlations: Using PCT**
@@ -94,6 +95,8 @@ cor(heartmort[12:17])
 
 #Table of correlations : Population, Housing, Income
 cor(heartmort[c(1,3:6)])
+
+
 ```
 
 
