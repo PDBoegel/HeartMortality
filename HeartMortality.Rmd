@@ -138,4 +138,6 @@ Get rid of percents - multiply demographic percents by population in each county
 
 Eliminate high leverage points before transforming variables
 
+Create possible ANOVA model and assess if any (residuals)^2 account for a significant portion of ESS
+
 
