@@ -70,7 +70,6 @@ par(mfrow = c(2,3))
 # lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
 ```
 
-<<<<<<< HEAD
 **Table of Correlations:**
 ```{r}
 #Table of correlations : EDUCATION LEVEL AND OBESITY/DIABETES RATES
@@ -85,8 +84,6 @@ cor(heartmort[c(46,48:51)])
 
 
 
-=======
->>>>>>> 979c3b31bd5b946dd57bfdf7c19b573a08f9043c
 **linear model analysis**
 
 ```{r}
@@ -154,7 +151,5 @@ hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15
 ### Notes ############################
 
 Get rid of percents - multiply demographic percents by population in each county
-
-Eliminate high leverage points before transforming variables
 
 
