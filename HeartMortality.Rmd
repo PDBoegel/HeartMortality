@@ -100,13 +100,12 @@ summary(catlm)
 
 ```{r, eval = FALSE}
 #CHANGE tlm BASE UPON WHICH MODEL CHOSEN FROM ABOVE
-resid = rstandard(tlm)
-leverage = hatvalues(tlm) 
+resid = rstandard(totlm)
+leverage = hatvalues(totlm) 
 
 hist(resid, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
 
-
-k = dim(heartmort)[2]
+k = length(totlm$coefficients)-1
 n = dim(heartmort)[1]
 averagelev = (k+1)/n
 3*averagelev
@@ -121,15 +120,38 @@ length(which(leverage > 3*averagelev))
 which(leverage > 6*averagelev)
 length(which(leverage > 6*averagelev))
 
+which(abs(resid) > 2)
+length(which(abs(resid) > 2))
 ```
 
 ```{r, eval = FALSE}
 levs <-as.numeric(which(leverage > 3*averagelev))
 levs
-lev6heartmort = heartmort[-levs,]
-lmlev6 = lm(HDMORTPERPERSON ~ ., data = lev6heartmort)
-summary(lmlev6)
+lev3heartmort = heartmort[-levs,]
+lmlev3 = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = lev3heartmort)
+summary(lmlev3)
 ```
+
+**TOTLM without high standardized residuals**
+```{r}
+resid2 = as.numeric(which(abs(resid) > 2))
+
+resid2heartmort = heartmort[-resid2,]
+lmresid2 = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = resid2heartmort)
+summary(lmresid2)
+
+
+
+```
+
+```{r}
+totalsensheartmort = heartmort[c(-resid2,-levs)]
+
+lmtotalsens = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = totalsensheartmort)
+summary(lmtotalsens)
+
+```
+
 
 ```{r, eval = FALSE}
 residlev6 = rstandard(lmlev6)
@@ -152,5 +174,4 @@ hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15
 Get rid of percents - multiply demographic percents by population in each county
 
 Eliminate high leverage points before transforming variables
-
 
