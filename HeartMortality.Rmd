@@ -52,11 +52,11 @@ totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABE
 heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[7:19])
 
 # Making categories for PCT variables
-catCols <- c("CATLOWEDU","CATMEDEDU","CATHIGHEDU","CATOBESE","CATDIABETES","CATMALE","CATFEMALE","CATWHITE","CATAFRAM","CATASIANAM","CATNATIVEAM","CATUNEMPLOYED","CATNONELDERLY")
+catCols <- c("CATHDMORTPERPERSON","CATLOWEDU","CATMEDEDU","CATHIGHEDU","CATOBESE","CATDIABETES","CATMALE","CATFEMALE","CATWHITE","CATAFRAM","CATASIANAM","CATNATIVEAM","CATUNEMPLOYED","CATNONELDERLY")
 heartmort[catCols] <- 0
-df <- lapply(7:19, function(i) cut(heartmort[,i], c(-.01, max(0, as.numeric(quantile(heartmort[,i], probs = 0.5)) - (1.5 * (as.numeric(quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i],probs = 0.25))))), min(1, as.numeric(quantile(heartmort[,i], probs = 0.5)) + (1.5 * as.numeric((quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i], probs = 0.25))))),1.01), right = FALSE, labels = c(0:2)))
+df <- lapply(c(2,7:19), function(i) cut(heartmort[,i], c(-.01, max(0, as.numeric(quantile(heartmort[,i], probs = 0.25)) - (1.5 * (as.numeric(quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i],probs = 0.25))))), min(1, as.numeric(quantile(heartmort[,i], probs = 0.75)) + (1.5 * as.numeric((quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i], probs = 0.25))))),1.01), right = FALSE, labels = c(0:2)))
 
-heartmort[33:45] <- df
+heartmort[33:46] <- df
 colnames(heartmort)[33:45] <- catCols
 # Log transformations from what was specified above
 logCols <- c("LNPOPSIZE","LNHDMORTPERPERSON","LNPOPDENSITY","LNHOUSINGUNITS","LNHOUSINGUNITSDENSITY","LNAVGINCOMEPERPERSON")
@@ -70,15 +70,45 @@ par(mfrow = c(2,3))
 # lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
 ```
 
+
+**Table of Correlations: Using TOTAL POP**
+```{r}
+#Table of correlations : EDUCATION LEVEL AND OBESITY/DIABETES RATES
+cor(heartmort[20:24])
+
+#Table of correlations : Demographic
+cor(heartmort[25:30])
+
+#Table of correlations : Population, Housing, Income
+#cor(heartmort[c(46,48,49,50,51)])
+```
+
+**Table of Correlations: Using PCT**
+```{r}
+#Table of correlations : EDUCATION LEVEL AND OBESITY/DIABETES RATES
+cor(heartmort[20:24])
+
+#Table of correlations : Demographic
+cor(heartmort[25:30])
+
+#Table of correlations : Population, Housing, Income
+#cor(heartmort[c(46,48,49,50,51)])
+
+
+
+```
+
+
 **linear model analysis**
 
 ```{r}
-totlm = lm(LNHDMORTPERPERSON ~ 1, data = heartmort)
+attach(heartmort)
+totlm = lm(LNHDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPDENSITY + LNHOUSINGUNITSDENSITY + LNAVGINCOMEPERPERSON, data = heartmort)
 summary(totlm)
 ```
 
 ```{r}
-catlm = lm(LNHDMORTPERPERSON ~ 1, data = heartmort)
+catlm = lm(LNHDMORTPERPERSON ~ factor(CATLOWEDU) + factor(CATMEDEDU) + factor(CATHIGHEDU) + LNTOTDIABETES + factor(CATMALE) + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + factor(CATWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY + LNAVGINCOMEPERPERSON, data = heartmort)
 summary(catlm)
 ```
 
@@ -86,13 +116,12 @@ summary(catlm)
 
 ```{r, eval = FALSE}
 #CHANGE tlm BASE UPON WHICH MODEL CHOSEN FROM ABOVE
-resid = rstandard(tlm)
-leverage = hatvalues(tlm) 
+resid = rstandard(totlm)
+leverage = hatvalues(totlm) 
 
 hist(resid, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
 
-
-k = dim(heartmort)[2]
+k = length(totlm$coefficients)-1
 n = dim(heartmort)[1]
 averagelev = (k+1)/n
 3*averagelev
@@ -107,15 +136,38 @@ length(which(leverage > 3*averagelev))
 which(leverage > 6*averagelev)
 length(which(leverage > 6*averagelev))
 
+which(abs(resid) > 2)
+length(which(abs(resid) > 2))
 ```
 
 ```{r, eval = FALSE}
 levs <-as.numeric(which(leverage > 3*averagelev))
 levs
-lev6heartmort = heartmort[-levs,]
-lmlev6 = lm(HDMORTPERPERSON ~ ., data = lev6heartmort)
-summary(lmlev6)
+lev3heartmort = heartmort[-levs,]
+lmlev3 = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = lev3heartmort)
+summary(lmlev3)
 ```
+
+**TOTLM without high standardized residuals**
+```{r}
+resid2 = as.numeric(which(abs(resid) > 2))
+
+resid2heartmort = heartmort[-resid2,]
+lmresid2 = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = resid2heartmort)
+summary(lmresid2)
+
+
+
+```
+
+```{r}
+totalsensheartmort = heartmort[c(-resid2,-levs)]
+
+lmtotalsens = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = totalsensheartmort)
+summary(lmtotalsens)
+
+```
+
 
 ```{r, eval = FALSE}
 residlev6 = rstandard(lmlev6)
@@ -132,12 +184,9 @@ hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15
 ```
 *End sensitivity analysis*
 
+
 ### Notes ############################
 
 Get rid of percents - multiply demographic percents by population in each county
 
 Eliminate high leverage points before transforming variables
-
-Create possible ANOVA model and assess if any (residuals)^2 account for a significant portion of ESS
-
-
