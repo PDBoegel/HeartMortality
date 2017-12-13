@@ -8,21 +8,27 @@ Gathering Data:
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
 heartmort = heartmortCOMPLETE[-c(1:4,7,24:26)] #Getting rid of variables for metadata and other dependent variable
+options(max.print = 4000)
 ```
 
 # Basic data manipulation to better fit normality assumptions for linear models
 
 ```{r}
 heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30 # To account for elderly population
-heartmort <- subset(heartmort, AVGINCOMEPERPERSON > 0)
-summary(heartmort)
+heartmort <- subset(heartmort, AVGINCOMEPERPERSON > 0 & PCTASIANAM != 0 & PCTAFRAM != 0 & PCTNATIVEAM != 0) # 26 counties had 0 avgincome/PCTAFRAM/PCTNATIVEAM/PCTASAINAM, removal should not affect study and makes histogram/log transform variables easier to make/use later
+summaryOfVars <- summary(heartmort)
+summaryOfVars
 ```
-**Removed 3 observations due to avg inc / person = 0**
+```{r, echo=FALSE}
+heartmort <- heartmort[,c(1:6,14:16,19,7:13,18,20)] #Organization to make category variables easier later on. Does not need to go into document
 
+heartmort[,c(7:19)] <- heartmort[,c(7:19)]/100 # Making percents into numbers [0,1]
+```
 
-```{r, results='hide'}
-par(mfrow = c(2,3))
-lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
+```{r, results='hide', echo=FALSE}
+# Put These into the appendix
+# par(mfrow = c(2,3))
+# lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
 
 From looking at the summary and histograms of the Variables, those that need to be transformed are:
@@ -42,50 +48,44 @@ All Percentage variables besides diabetes and obesity
 Notes: Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points, otherwise we add one so their log values are inf    
 ```{r, results='hide'}
 # We log totals imeediately as popsize varies widely from county to county
-totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNTOTASIANAM","LNTOTNONELDERLY")
-heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[10:19])
+totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNTOTAFRAM","LNTOTASIANAM","LNTOTNATIVEAM","LNTOTUNEMPLOYED","LNTOTNONELDERLY")
+heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[7:19])
 
 # Making categories for PCT variables
+catCols <- c("CATLOWEDU","CATMEDEDU","CATHIGHEDU","CATOBESE","CATDIABETES","CATMALE","CATFEMALE","CATWHITE","CATAFRAM","CATASIANAM","CATNATIVEAM","CATUNEMPLOYED","CATNONELDERLY")
+heartmort[catCols] <- 0
+df <- lapply(7:19, function(i) cut(heartmort[,i], c(-.01, max(0, as.numeric(quantile(heartmort[,i], probs = 0.5)) - (1.5 * (as.numeric(quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i],probs = 0.25))))), min(1, as.numeric(quantile(heartmort[,i], probs = 0.5)) + (1.5 * as.numeric((quantile(heartmort[,i], probs = 0.75)) - as.numeric(quantile(heartmort[,i], probs = 0.25))))),1.01), right = FALSE, labels = c(0:2)))
 
-
+heartmort[33:45] <- df
+colnames(heartmort)[33:45] <- catCols
 # Log transformations from what was specified above
 logCols <- c("LNPOPSIZE","LNHDMORTPERPERSON","LNPOPDENSITY","LNHOUSINGUNITS","LNHOUSINGUNITSDENSITY","LNAVGINCOMEPERPERSON")
 heartmort[logCols] <- log(heartmort[1:6])
 par(mfrow = c(2,3))
-lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
 
-# Basic linear models
+```{r, results='hide', echo=FALSE}
+# Put these into the appendix
+# par(mfrow = c(2,3))
+# lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
+```
+
+**linear model analysis**
 
 ```{r}
-naivelm = lm(LNHDMORTPERPERSON ~ LNPOPSIZE + LNHOUSINGUNITS + LNAVGINCOMEPERPERSON , data = heartmort)
-summary(naivelm)
+totlm = lm(LNHDMORTPERPERSON ~ 1, data = heartmort)
+summary(totlm)
 ```
 
 ```{r}
-tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
+catlm = lm(LNHDMORTPERPERSON ~ 1, data = heartmort)
+summary(catlm)
 ```
 
-```{r, eval = FALSE}
-tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
-summary(tlm)
-```
+**Sensitivity Analysis** 
 
 ```{r, eval = FALSE}
-newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65, data = heartmort)
-summary(newmodel)
-```
-
-
-```{r, eval = FALSE}
-#newmodel <- lm(HDMORTPERPERSON ~ HOUSINGUNITS + PCTDIABETES + PCTWHITE + PCTAFRAM + PCTASIANAM + PCTNATIVEAM + PCTOBESE + PCTPOPUNDER65 + factor(MALEDOM), data = heartmort)
-#summary(newmodel)
-```
-
-
-**Sensitivity Analysis**
-
-```{r, eval = FALSE}
+#CHANGE tlm BASE UPON WHICH MODEL CHOSEN FROM ABOVE
 resid = rstandard(tlm)
 leverage = hatvalues(tlm) 
 
@@ -132,35 +132,6 @@ hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15
 ```
 *End sensitivity analysis*
 
-*Demographic quantiles*
-```{r}
-quantile(heartmort$PCTAFRAM,probs = 0.95)
-quantile(heartmort$PCTASIANAM,probs = 0.95)
-quantile(heartmort$PCTNATIVEAM,probs = 0.95)
-quantile(heartmort$PCTWHITE,probs = 0.95)
-
-
-heartmort$MALEDOM = cut(heartmort$PCTMALE,breaks = c(0  , 50 , 100.1) , labels = c("0","1"))
-
-heartmort$SIGNIFICANTAFRAM = cut(heartmort$PCTAFRAM,breaks = c(0  , quantile(heartmort$PCTAFRAM,probs = 0.95) , 100.1) , labels = c("0","1"))
-
-heartmort$SIGNIFICANTASIANAM = cut(heartmort$PCTASIANAM,breaks = c(0  , quantile(heartmort$PCTASIANAM,probs = 0.95) , 100.1) , labels = c("0","1"))
-
-heartmort$SIGNIFICANTNATIVEAM = cut(heartmort$PCTNATIVEAM,breaks = c(0  , quantile(heartmort$PCTNATIVEAM,probs = 0.95) , 100.1) , labels = c("0","1"))
-
-heartmort$SIGNIFICANTWHITE = cut(heartmort$PCTWHITE,breaks = c(0  , quantile(heartmort$PCTWHITE,probs = 0.95) , 100.1) , labels = c("0","1"))
-
-factor(heartmort$PCTMALE , levels = c("0","1"), labels = c("Majority Female","Majority Male" )) # Doesnt work
-```
-
-
-```{r}
-
-
-
-
-
-```
 
 ### Notes ############################
 
