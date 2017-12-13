@@ -77,25 +77,23 @@ par(mfrow = c(2,3))
 cor(heartmort[20:24])
 
 #Table of correlations : Demographic
+
 cor(heartmort[25:30])
 
 #Table of correlations : Population, Housing, Income
-cor(heartmort[c(46,48,49,50,51)])
+cor(heartmort[c(47,49:52)])
 ```
 
 **Table of Correlations: Using PCT**
 ```{r}
 #Table of correlations : EDUCATION LEVEL AND OBESITY/DIABETES RATES
-cor(heartmort[20:24])
+cor(heartmort[7:11])
 
 #Table of correlations : Demographic
-cor(heartmort[25:30])
+cor(heartmort[12:17])
 
 #Table of correlations : Population, Housing, Income
-cor(heartmort[c(46,48,49,50,51)])
-
-
-
+cor(heartmort[c(1,3:6)])
 ```
 
 
@@ -115,7 +113,6 @@ summary(catlm)
 **Sensitivity Analysis** 
 
 ```{r, eval = FALSE}
-#CHANGE tlm BASE UPON WHICH MODEL CHOSEN FROM ABOVE
 resid = rstandard(totlm)
 leverage = hatvalues(totlm) 
 
@@ -128,7 +125,7 @@ averagelev = (k+1)/n
 hist(leverage, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
 ```
 
-
+*Can be deleted once we're done*
 ```{r, eval = FALSE}
 which(leverage > 3*averagelev)
 length(which(leverage > 3*averagelev))
@@ -136,7 +133,7 @@ length(which(leverage > 3*averagelev))
 which(leverage > 6*averagelev)
 length(which(leverage > 6*averagelev))
 
-which(abs(resid) > 2)
+as.numeric(which(abs(resid) > 2))
 length(which(abs(resid) > 2))
 ```
 
@@ -161,7 +158,7 @@ summary(lmresid2)
 ```
 
 ```{r}
-totalsensheartmort = heartmort[c(-resid2,-levs)]
+totalsensheartmort = heartmort[c(-resid2,-levs),]
 
 lmtotalsens = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = totalsensheartmort)
 summary(lmtotalsens)
@@ -169,19 +166,6 @@ summary(lmtotalsens)
 ```
 
 
-```{r, eval = FALSE}
-residlev6 = rstandard(lmlev6)
-leveragelev6 = hatvalues(lmlev6) 
-
-hist(residlev6, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
-
-
-k = dim(lev6heartmort)[2]
-n = dim(lev6heartmort)[1]
-averagelev = (k+1)/n
-3*averagelev
-hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
-```
 *End sensitivity analysis*
 
 
@@ -189,5 +173,4 @@ hist(leveragelev6, main="Histogram of Leverages", xlab = "Leverage", breaks = 15
 
 Get rid of percents - multiply demographic percents by population in each county
 
-Eliminate high leverage points before transforming variables
 
