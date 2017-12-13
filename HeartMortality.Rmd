@@ -8,28 +8,21 @@ Gathering Data:
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
 heartmort = heartmortCOMPLETE[-c(1:4,7,24:26)] #Getting rid of variables for metadata and other dependent variable
+
 ```
-
-
 
 # Basic data manipulation to better fit normality assumptions for linear models
 
 ```{r}
 heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30 # To account for elderly population
-heartmort <- subset(heartmort, AVGINCOMEPERPERSON > 0) # 3 counties had 0 avgincome, removal should not affect study and makes histogram/log transform variables better later
-summaryOfVars <- summary(heartmort)
-summaryOfVars
-```
-```{r, echo=FALSE}
-heartmort <- heartmort[,c(1:6,14:16,19,7:13,18,20,17)] #Organization to make category variables easier later on. Does not need to go into document
-heartmort[,c(10:19)] <- heartmort[,c(10:19)]/100 # Making percents into numbers [0,1]
+heartmort <- subset(heartmort, AVGINCOMEPERPERSON > 0)
+summary(heartmort)
 ```
 ```{r, results='hide'}
 par(mfrow = c(2,3))
 lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
 
-~ANALYSIS NOTES~
 From looking at the summary and histograms of the Variables, those that need to be transformed are:
 
 Log transform:
@@ -44,19 +37,28 @@ TOTUNEMPLOYED [log]
 categorized:
 All Percentage variables besides diabetes and obesity
 
-Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points    
+Notes: Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points, otherwise we add one so their log values are inf    
 ```{r, results='hide'}
-# We log totals imeediately as popsize varies widely from county to county
-totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNAFRAM","LNTOTASIANAM","LNNATIVEAM","LNTOTUNEMPLOYED","LNTOTNONELDERLY")
-heartmort[totCols] <- log(heartmort$POPSIZE * heartmort[7:19])
+heartmortlog = heartmort
 
-# Making categories for PCT variables
+heartmort$LNPOPSIZE <- log(heartmort$POPSIZE)
+heartmort$LNHDMORTPERPERSON <- log(heartmort$HDMORTPERPERSON)
+heartmort$LNPOPDENSITY <- log(heartmort$POPDENSITY)
+heartmort$LNHOUSINGUNITS <- log(heartmort$HOUSINGUNITS)
+heartmort$LNHOUSINGUNITDENSITY <- log(heartmort$HOUSINGUNITDENSITY)
+heartmort$LNAVGINCOMEPERPERSON <- log(heartmort$AVGINCOMEPERPERSON + 1)
+heartmort$LNTOTUNEMPLOYED <- log(heartmort$TOTUNEMPLOYED)
 
-
-# Log transformations from what was specified above
-logCols <- c("LNPOPSIZE","LNHDMORTPERPERSON","LNPOPDENSITY","LNHOUSINGUNITS","LNHOUSINGUNITSDENSITY","LNAVGINCOMEPERPERSON")
-heartmort[logCols] <- log(heartmort[1:6])
-
+heartmort$TOTDIABETES <- (log(heartmort$POPSIZE * (heartmort$PCTDIABETES/100)))
+heartmort$TOTMALE <- (log(heartmort$POPSIZE * (heartmort$PCTMALE/100)))
+heartmort$TOTFEMALE <- (log(heartmort$POPSIZE * (heartmort$PCTFEMALE/100)))
+heartmort$TOTWHITE <- (log(heartmort$POPSIZE * (heartmort$PCTWHITE/100)))
+heartmort$TOTASIANAM <- (log(heartmort$POPSIZE * (heartmort$PCTASIANAM/100)))
+heartmort$TOTNATIVEAM <- (log(heartmort$POPSIZE * (heartmort$PCTNATIVEAM/100)))
+heartmort$TOTLOWEDU <- (log(heartmort$POPSIZE * (heartmort$LOWEDUCATION/100)))
+heartmort$TOTMEDEDU <- (log(heartmort$POPSIZE * (heartmort$MEDEDUCATION/100)))
+heartmort$TOTHIGHEDU <- (log(heartmort$POPSIZE * (heartmort$HIGHEDUCATION/100)))
+heartmort$TOTNONELDERLY <- (log(heartmort$POPSIZE * (heartmort$PCTPOPUNDER65/100)))
 par(mfrow = c(2,3))
 lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
@@ -68,13 +70,14 @@ naivelm = lm(LNHDMORTPERPERSON ~ LNPOPSIZE + LNHOUSINGUNITS + LNAVGINCOMEPERPERS
 summary(naivelm)
 ```
 
+<<<<<<< HEAD
 ```{r}
-tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
-summary(heartmort)
+tlm = lm(HDMORTPERPERSON ~ ., data = heartmortlog)
 ```
 
 ```{r, eval = FALSE}
 tlm = lm(HDMORTPERPERSON ~ 1, data = heartmort)
+>>>>>>> 229dfc644298272343dc2c203f18f75de34f1f2c
 summary(tlm)
 ```
 
@@ -93,10 +96,13 @@ summary(newmodel)
 **Sensitivity Analysis**
 
 ```{r, eval = FALSE}
+>>>>>>> 229dfc644298272343dc2c203f18f75de34f1f2c
 resid = rstandard(tlm)
 leverage = hatvalues(tlm) 
 
 hist(resid, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
+
+
 k = dim(heartmort)[2]
 n = dim(heartmort)[1]
 averagelev = (k+1)/n
@@ -154,4 +160,7 @@ Get rid of percents - multiply demographic percents by population in each county
 
 Eliminate high leverage points before transforming variables
 
+```{r}
+mtcars$vs
 
+```
