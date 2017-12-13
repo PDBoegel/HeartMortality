@@ -71,7 +71,7 @@ par(mfrow = c(2,3))
 ```
 
 
-**Table of Correlations:**
+**Table of Correlations: Using TOTAL POP**
 ```{r}
 #Table of correlations : EDUCATION LEVEL AND OBESITY/DIABETES RATES
 cor(heartmort[20:24])
@@ -80,8 +80,24 @@ cor(heartmort[20:24])
 cor(heartmort[25:30])
 
 #Table of correlations : Population, Housing, Income
-# cor(heartmort[c(46,48:51)])
+cor(heartmort[c(46,48,49,50,51)])
 ```
+
+**Table of Correlations: Using PCT**
+```{r}
+#Table of correlations : EDUCATION LEVEL AND OBESITY/DIABETES RATES
+cor(heartmort[20:24])
+
+#Table of correlations : Demographic
+cor(heartmort[25:30])
+
+#Table of correlations : Population, Housing, Income
+cor(heartmort[c(46,48,49,50,51)])
+
+
+
+```
+
 
 **linear model analysis**
 
