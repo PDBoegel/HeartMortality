@@ -25,27 +25,6 @@ heartmort <- heartmort[,c(1:6,14:16,19,7:13,18,20)] #Organization to make catego
 heartmort[,c(7:19)] <- heartmort[,c(7:19)]/100 # Making percents into numbers [0,1]
 ```
 
-```{r, results='hide', echo=FALSE}
-# Put These into the appendix
-# par(mfrow = c(2,3))
-# lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
-```
-
-From looking at the summary and histograms of the Variables, those that need to be transformed are:
-
-Log transform:
-POPSIZE [log]
-HDMORTPERPERSON [log]
-POPDENSITY [log]
-HOUSINGUNITS [log]
-HOUSINGUNITDENSITY [log]
-AVGINCOMEPERPERSON [log]
-TOTUNEMPLOYED [log]
-
-categorized:
-All Percentage variables besides diabetes and obesity
-
-Notes: Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points, otherwise we add one so their log values are inf    
 ```{r, results='hide'}
 # We log totals imeediately as popsize varies widely from county to county
 totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNTOTAFRAM","LNTOTASIANAM","LNTOTNATIVEAM","LNTOTUNEMPLOYED","LNTOTNONELDERLY")
@@ -64,29 +43,70 @@ heartmort[logCols] <- log(heartmort[1:6])
 par(mfrow = c(2,3))
 ```
 
-```{r, results='hide', echo=FALSE}
-# Put these into the appendix
-# par(mfrow = c(2,3))
-# lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
-```
+**linear model analysis**
 
-
-**Table of Correlations: Using TOTAL POP**
 ```{r}
-#Table of correlations : EDUCATION LEVEL AND OBESITY/DIABETES RATES
-cor(heartmort[20:24])
-
-#Table of correlations : Demographic
-
-cor(heartmort[25:30])
-
-#Table of correlations : Population, Housing, Income
-cor(heartmort[c(47,49:52)])
-
+attach(heartmort)
+totlm = lm(LNHDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPDENSITY + LNHOUSINGUNITSDENSITY + LNAVGINCOMEPERPERSON, data = heartmort)
+summary(totlm)
 ```
+
+```{r}
+pctlm <- lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(HIGHEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTMALE) + log(PCTNATIVEAM) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTUNEMPLOYED) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY + LNAVGINCOMEPERPERSON, data = heartmort)
+summary(pctlm)
+```
+
+```{r}
+catlm = lm(LNHDMORTPERPERSON ~ factor(CATLOWEDU) + factor(CATMEDEDU) + factor(CATHIGHEDU) + LNTOTDIABETES + factor(CATMALE) + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + factor(CATWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY + LNAVGINCOMEPERPERSON, data = heartmort)
+summary(catlm)
+```
+
+```{r}
+model <- lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTMALE) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmort)
+summary(model)
+anova(model, pctlm)
+```
+**Sensitivity Analysis** 
+
+```{r}
+leverage = hatvalues(model) 
+
+k = length(model$coefficients)-1
+n = dim(heartmort)[1]
+averagelev = (k+1)/n
+hist(leverage, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
+levs <-as.numeric(which(leverage > 3*averagelev))
+heartmortNoLev = heartmort[-levs,]
+modelNoLev <- lm(LNHDMORTPERPERSON ~ LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTWHITE + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmortNoLev)
+summary(modelNoLev)
+```
+
+
+**Model without high standardized residuals**
+```{r}
+hist(rstandard(model), main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
+resid = as.numeric(which(abs(rstandard(model)) > 2))
+
+heartmortNoHighResid = heartmort[-resid,]
+modelNoHighResid <- lm(LNHDMORTPERPERSON ~ LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTWHITE + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmortNoHighResid)
+summary(modelNoHighResid)
+```
+
+
+**Model without both high std residuals and leverage points**
+```{r}
+heartmortFinal = heartmort[c(-resid,-levs),]
+modelFinal <- lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTMALE) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmortFinal)
+summary(modelFinal)
+```
+
+
+**End sensitivity analysis**
+
+**Collinearity**
 
 **Table of Correlations: Using PCT**
-```{r}
+```{r, message=FALSE, warning=FALSE}
 #Table of correlations : EDUCATION LEVEL AND OBESITY/DIABETES RATES
 cor(heartmort[7:11])
 
@@ -96,84 +116,19 @@ cor(heartmort[12:17])
 #Table of correlations : Population, Housing, Income
 cor(heartmort[c(1,3:6)])
 
-
+library(faraway)
+vif(modelFinal)
 ```
 
+# Appendix
 
-**linear model analysis**
-
-```{r}
-attach(heartmort)
-totlm = lm(LNHDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPDENSITY + LNHOUSINGUNITSDENSITY + LNAVGINCOMEPERPERSON, data = heartmort)
-summary(totlm)
+```{r, results='hide', echo=FALSE}
+# Put These into the appendix
+par(mfrow = c(2,3))
+lapply(1:19, function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
-
-```{r}
-catlm = lm(LNHDMORTPERPERSON ~ factor(CATLOWEDU) + factor(CATMEDEDU) + factor(CATHIGHEDU) + LNTOTDIABETES + factor(CATMALE) + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + factor(CATWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY + LNAVGINCOMEPERPERSON, data = heartmort)
-summary(catlm)
+```{r, results='hide', echo=FALSE}
+# Put these into the appendix
+par(mfrow = c(2,3))
+lapply(c(20:32,47:52), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
 ```
-
-**Sensitivity Analysis** 
-
-```{r, eval = FALSE}
-resid = rstandard(totlm)
-leverage = hatvalues(totlm) 
-
-hist(resid, main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
-
-k = length(totlm$coefficients)-1
-n = dim(heartmort)[1]
-averagelev = (k+1)/n
-3*averagelev
-hist(leverage, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
-```
-
-*Can be deleted once we're done*
-```{r, eval = FALSE}
-which(leverage > 3*averagelev)
-length(which(leverage > 3*averagelev))
-
-which(leverage > 6*averagelev)
-length(which(leverage > 6*averagelev))
-
-as.numeric(which(abs(resid) > 2))
-length(which(abs(resid) > 2))
-```
-
-```{r, eval = FALSE}
-levs <-as.numeric(which(leverage > 3*averagelev))
-levs
-lev3heartmort = heartmort[-levs,]
-lmlev3 = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = lev3heartmort)
-summary(lmlev3)
-```
-
-**TOTLM without high standardized residuals**
-```{r}
-resid2 = as.numeric(which(abs(resid) > 2))
-
-resid2heartmort = heartmort[-resid2,]
-lmresid2 = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = resid2heartmort)
-summary(lmresid2)
-
-
-
-```
-
-```{r}
-totalsensheartmort = heartmort[c(-resid2,-levs),]
-
-lmtotalsens = lm(HDMORTPERPERSON ~ LNTOTLOWEDU + LNTOTMEDEDU + LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + LNTOTDIABETES + LNTOTFEMALE + LNTOTMALE + LNTOTNATIVEAM + LNTOTNONELDERLY + LNTOTOBESE + LNTOTUNEMPLOYED + LNTOTWHITE + LNPOPSIZE + LNHOUSINGUNITS, data = totalsensheartmort)
-summary(lmtotalsens)
-
-```
-
-
-*End sensitivity analysis*
-
-
-### Notes ############################
-
-Get rid of percents - multiply demographic percents by population in each county
-
-
