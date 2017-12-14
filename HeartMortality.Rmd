@@ -25,27 +25,6 @@ heartmort <- heartmort[,c(1:6,14:16,19,7:13,18,20)] #Organization to make catego
 heartmort[,c(7:19)] <- heartmort[,c(7:19)]/100 # Making percents into numbers [0,1]
 ```
 
-```{r, results='hide', echo=FALSE}
-# Put These into the appendix
-# par(mfrow = c(2,3))
-# lapply(1:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
-```
-
-From looking at the summary and histograms of the Variables, those that need to be transformed are:
-
-Log transform:
-POPSIZE [log]
-HDMORTPERPERSON [log]
-POPDENSITY [log]
-HOUSINGUNITS [log]
-HOUSINGUNITDENSITY [log]
-AVGINCOMEPERPERSON [log]
-TOTUNEMPLOYED [log]
-
-categorized:
-All Percentage variables besides diabetes and obesity
-
-Notes: Some data in AVGINCOMEPERPERSON is zero which is strange might want to consider removing these points, otherwise we add one so their log values are inf    
 ```{r, results='hide'}
 # We log totals imeediately as popsize varies widely from county to county
 totCols <- c("LNTOTLOWEDU","LNTOTMEDEDU","LNTOTHIGHEDU","LNTOTOBESE","LNTOTDIABETES","LNTOTMALE","LNTOTFEMALE","LNTOTWHITE","LNTOTAFRAM","LNTOTASIANAM","LNTOTNATIVEAM","LNTOTUNEMPLOYED","LNTOTNONELDERLY")
@@ -63,13 +42,6 @@ logCols <- c("LNPOPSIZE","LNHDMORTPERPERSON","LNPOPDENSITY","LNHOUSINGUNITS","LN
 heartmort[logCols] <- log(heartmort[1:6])
 par(mfrow = c(2,3))
 ```
-
-```{r, results='hide', echo=FALSE}
-# Put these into the appendix
-# par(mfrow = c(2,3))
-# lapply(21:ncol(heartmort), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
-```
-
 
 **linear model analysis**
 
@@ -148,4 +120,15 @@ library(faraway)
 vif(modelFinal)
 ```
 
+# Appendix
 
+```{r, results='hide', echo=FALSE}
+# Put These into the appendix
+par(mfrow = c(2,3))
+lapply(1:19, function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
+```
+```{r, results='hide', echo=FALSE}
+# Put these into the appendix
+par(mfrow = c(2,3))
+lapply(c(20:32,47:52), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
+```
