@@ -145,3 +145,13 @@ plot(e1resid,e2resid,main = "Added Variable Plot")
 
 abline(lm(e1resid ~ e2resid), col="red")
 ```
+
+```{r}
+
+
+
+
+
+
+```
+
