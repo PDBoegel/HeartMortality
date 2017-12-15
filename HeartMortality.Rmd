@@ -156,7 +156,7 @@ e4resid = residuals(e4)
 
 plot(e3resid,e4resid,main = "Added Variable Plot")
 
-abline(lm(e3resid ~ e4resid), col="red")
+abline(lm(e4resid ~ e3resid), col="red")
 ```
 
 
