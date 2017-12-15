@@ -133,7 +133,7 @@ par(mfrow = c(2,3))
 lapply(c(20:32,47:52), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
 ```
 
-**Added Variable Plot**
+**Added Variable Plot: PCTMALE**
 ```{r}
 e1 = lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmort)
 e2 = model <- lm(log(PCTMALE) ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmort)
@@ -145,6 +145,21 @@ plot(e1resid,e2resid,main = "Added Variable Plot")
 
 abline(lm(e1resid ~ e2resid), col="red")
 ```
+
+**Added Variable Plot : Ages**
+```{r}
+e3 = lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTMALE) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmortFinal)
+e4 = model <- lm(log(PCTPOPUNDER65) ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTMALE) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmortFinal)
+
+e3resid = residuals(e3)
+e4resid = residuals(e4)
+
+plot(e3resid,e4resid,main = "Added Variable Plot")
+
+abline(lm(e3resid ~ e4resid), col="red")
+```
+
+
 
 **Data Frame of Betas**
 ```{r}
