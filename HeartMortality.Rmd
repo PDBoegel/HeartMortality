@@ -170,3 +170,9 @@ betaframe = data.frame(coefficients , tvalues)
 betaframe
 ```
 
+**Proving there are no observations that are high leverage points AND outliers**
+```{r}
+sum((which(abs(rstandard(model)) > 2) == which(leverage > 3*averagelev))
+```
+
+
