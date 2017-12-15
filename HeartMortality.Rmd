@@ -146,12 +146,12 @@ plot(e1resid,e2resid,main = "Added Variable Plot")
 abline(lm(e1resid ~ e2resid), col="red")
 ```
 
+**Data Frame of Betas**
 ```{r}
+coefficients = c(modelFinal$coefficients)
+tvalues = c(-49.987 , 16.058 , 11.631 , 9.069 , -4.988 , 15.298 , -3.545 , 13.433 , 3.413 , 5.284 , -8.316 , 8.192)
 
-
-
-
-
-
+betaframe = data.frame(coefficients , tvalues)
+betaframe
 ```
 
