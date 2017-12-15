@@ -132,3 +132,16 @@ lapply(1:19, function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = 
 par(mfrow = c(2,3))
 lapply(c(20:32,47:52), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
 ```
+
+**Added Variable Plot**
+```{r}
+e1 = lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmort)
+e2 = model <- lm(log(PCTMALE) ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmort)
+
+e1resid = residuals(e1)
+e2resid = residuals(e2)
+
+plot(e1resid,e2resid,main = "Added Variable Plot")
+
+abline(lm(e1resid ~ e2resid), col="red")
+```
