@@ -132,3 +132,47 @@ lapply(1:19, function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = 
 par(mfrow = c(2,3))
 lapply(c(20:32,47:52), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) # This goes into the appendix
 ```
+
+**Added Variable Plot: PCTMALE**
+```{r}
+e1 = lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmort)
+e2 = model <- lm(log(PCTMALE) ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmort)
+
+e1resid = residuals(e1)
+e2resid = residuals(e2)
+
+plot(e1resid,e2resid,main = "Added Variable Plot")
+
+abline(lm(e1resid ~ e2resid), col="red")
+```
+
+**Added Variable Plot : Ages**
+```{r}
+e3 = lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTMALE) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmortFinal)
+e4 = model <- lm(log(PCTPOPUNDER65) ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTMALE) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmortFinal)
+
+e3resid = residuals(e3)
+e4resid = residuals(e4)
+
+plot(e3resid,e4resid,main = "Added Variable Plot")
+
+abline(lm(e4resid ~ e3resid), col="red")
+```
+
+
+
+**Data Frame of Betas**
+```{r}
+coefficients = c(modelFinal$coefficients)
+tvalues = c(-49.987 , 16.058 , 11.631 , 9.069 , -4.988 , 15.298 , -3.545 , 13.433 , 3.413 , 5.284 , -8.316 , 8.192)
+
+betaframe = data.frame(coefficients , tvalues)
+betaframe
+```
+
+**Proving there are no observations that are high leverage points AND outliers**
+```{r}
+sum((which(abs(rstandard(model)) > 2) == which(leverage > 3*averagelev))
+```
+
+
