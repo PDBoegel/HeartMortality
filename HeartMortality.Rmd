@@ -1,23 +1,26 @@
 ---
-title: Heart Disease Mortality Data Among US Adults (35+) by State/Territory and County
-author: Ben Malewicki, Dalton Marske, Paul Boegel, Taner Carlson
-date: 21 December 2017
-output: 
+title: "Heart Disease Mortality Data Among US Adults (35+) by State/Territory and County"
+author: "Ben Malewicki, Dalton Marske, Paul Boegel, Taner Carlson"
+date: "21 December 2017"
+output:
   html_document:
-    toc: true
-    toc_depth: 4
     theme: united
+    toc: yes
+    toc_depth: 4
+  pdf_document:
+    toc: yes
+    toc_depth: '4'
 ---
-# ABSTRACT
+#Abstract
 
-  This report looked to bring into light and examine how United States County-based Socioeconomic
+<div style="text-indent: 30px;">This report looked to bring into light and examine how United States County-based Socioeconomic
 Factors impact Heart Disease. Appropriate data from the U.S. Census was fit into linear models, which
 were developed using R, a scripting language. The linear models revealed that age and diabetes have
 significant correlations to Heart Disease mortality. 
 
-# INTRODUCTION
+#Introduction
 
-  In the United States, an average of 630,000 people per year die from Heart Disease- accounting for
+<div style="text-indent: 30px;">In the United States, an average of 630,000 people per year die from Heart Disease- accounting for
 1 in every 4 deaths of American citizens. An American citizen has a heart attack every 40 seconds.
 Over 200 billion dollars are lost every year to Heart Disease. The goal of this project is to further
 analyze and pinpoint how socioeconomic factors of where one lives impacts this Heart Disease
@@ -33,7 +36,7 @@ models and create a reasonable justification awarding the model of highest merit
 study). Lastly, this report will comment on the limits of the study, propose and address possible
 sources of error, and offer alterations for future studies.
 
-  The problem of Heart Disease is extremely prevalent, it being the leading cause of both male and
+<div style="text-indent: 30px;">The problem of Heart Disease is extremely prevalent, it being the leading cause of both male and
 female deaths in the United States. In the past, studies have been done regarding specific
 demographics, such as race. Abraham Kagel, for example, produced his study entitled Epidemiologic
 studies on of coronary heart disease and stroke in Japanese men living in Japan, Hawaii and
@@ -45,9 +48,9 @@ Demographic Facts, emphasized Heart Disease in newborns around the world. This r
 aforementioned studies, aims to contribute to the available information by reviewing the connection
 between Heart Disease and socioeconomic factors by county within the United States in 2013.
 
-# DATA
+#Data
 
-  The data in this analysis comes from reliable sources within the U.S. government. Reports from the
+<div style="text-indent: 30px;">The data in this analysis comes from reliable sources within the U.S. government. Reports from the
 Center for Disease Control and Prevention (CDC) acquired obesity and diabetes rates per county in
 2013; reports from the Bureau of Labor Statistics acquired average wages per county in 2013; reports
 from the United States Census Bureau acquired population data in 2010. These sources provided
@@ -55,19 +58,19 @@ cross-sectional data of socioeconomic variables within the United States.  The m
 were combined by using Microsoft Excel functions and by matching each county’s FIPS code to
 consolidate all the variables of interest into one csv file.
 
-  While the initial sample size was for n = 3200 counties, after merging all of the necessary
+<div style="text-indent: 30px;">While the initial sample size was for n = 3200 counties, after merging all of the necessary
 explanatory variables, the final consolidated csv datasheet had observations for an individual’s
 probability of experiencing Heart Disease mortality for n = 3130 counties.  This slight reduction is
 insignificant to the overall analysis performed because of the large amount of available data.
 
-  It is noteworthy that the year of one of the data sheets is different. This distinction is trivial
+<div style="text-indent: 30px;">It is noteworthy that the year of one of the data sheets is different. This distinction is trivial
 because there are negligible changes from year to year in census data. This report acknowledges the
 year discrepancies and continues with the analysis under the assumption that there has been no
 significant population shifts between 2010 and 2013. Since United States census data is gathered
 every 10 years, this data is the most updated information regarding the population of the United
 States.
 
-  The main outcome of interest is an individual’s chance of dying from Heart Disease based on certain
+<div style="text-indent: 30px;">The main outcome of interest is an individual’s chance of dying from Heart Disease based on certain
 county-wide socioeconomic factors.  The initial variables used to describe the outcome of interest
 included county-wide race population demographics, education levels, obesity and diabetic rates,
 unemployment rates, average income per person, population and housing unit density per square mile,
@@ -77,25 +80,27 @@ common causes of Heart Disease, and then adding several popular demographic diff
 filter out general correlations. Each explanatory variable is by county, giving a better
 understanding of how general socioeconomic factors affect heart disease mortality chances.
 
-  Table 1 provides summary statistics for each variable.  After observing the maximum and minimum
+<div style="text-indent: 30px;">Appendix B provides summary statistics for each variable.  After observing the maximum and minimum
 amounts relative to a variable’s mean and median, it was apparent that many showed signs of heavily
 skewed tails.  POPDENSITY, for example, had an average of 259 people per square mile, with a standard
 deviation of 1720.624.  The maximum value for this variable was 69,468, more than forty standard
 deviations from the mean.
 
-  To try to compensate for this reality, two solutions were attempted in the analysis. The first
+<div style="text-indent: 30px;">To try to compensate for this reality, two solutions were attempted in the analysis. The first
 solution was to logarithmically transform heavily skewed variables to match a decidedly more normal
 (Gaussian) distribution, making the data more workable and easy to analyze.  The second solution was
 to change each percentage variable into a raw population total.  The motivation behind this was that
 percentages can be relatively high even if the county population is extremely small.
 
-  Histograms 1 and 2 display the percentage of African Americans in each county compared to the
+<div style="text-indent: 30px;">Histograms of PCTAFRAM and Histogram of LNTOTAFRAM display the percentage of African Americans in each county compared to the
 overall transformed raw population number of African Americans per county.  This transformation from
 percentages to numbers skewed the data further to the right, the opposite of expectation. Further
 analysis on the effects of individual outliers and high leverage points had to be conducted before
 disregarding the significance of raw numerical totals compared to percentages.
 
-  Several groups of explanatory variables presented serious collinearity concerns.  The data on the
+![](https://github.com/PDBoegel/HeartMortality/raw/master/histoAfram.png)
+
+<div style="text-indent: 30px;">Several groups of explanatory variables presented serious collinearity concerns.  The data on the
 percent of population who is male and the percent of population who is female resulted in a perfect
 correlation (r = -1.00). To eliminate such a high level of collinearity, the report will only work
 with the percentage of the population who is male, effectively eliminating unnecessary data and
@@ -106,31 +111,33 @@ reducing the variable count from three to one, the respective linear models beca
 and allow for better testing on whether this variable is significant in explaining an individual’s
 chance of heart disease mortality.
 
-  To find unusual points in the data, scripts were written to find high leverage points and outliers.
-A leverage plot was created to visually represent leverage values for all observations. (Refer to an
-image of the leverage plot in the Appendix) Once we found the average leverage value, 96 observations
+<div style="text-indent: 30px;">To find unusual points in the data, scripts were written to find high leverage points and outliers.
+A leverage plot was created to visually represent leverage values for all observations.
+Once we found the average leverage value, 96 observations
 were identified that exceeded the threshold to be considered a “high leverage point” (3 * average
 leverage value). After deleting those high leverage points from the model, the R^2 value dropped from
 0.5372 to 0.5185 - a 3.5% decrease.
 
-  Similar steps were followed to detect outliers in the data. First, a standardized residual plot was
+![](https://github.com/PDBoegel/HeartMortality/raw/master/histoLev.png)
+
+<div style="text-indent: 30px;">Similar steps were followed to detect outliers in the data. First, a standardized residual plot was
 created to visually represent all of the standardized residuals in the model. Then script was written
 which detected 153 observations that have an absolute value of greater than 2 for its standardized
 residual. Through an examination of the observations between the outliers and high leverage points,
-it is noteworthy that no points in the model were both outliers and high leverage points (Appendix).
+it is noteworthy that no points in the model were both outliers and high leverage points (Appendix H).
 When the outliers were removed from the regression (keeping the high leverage points), the R^2 value
 increased from 0.5372 to 0.5917 - a 10.5% increase. A regression without both high leverage points
 and outliers resulted in an R^2 value of 0.5951 - a 10.8% increase from the original regression.
 
-  Through this sensitivity analysis, this report concluded that the model is relatively insensitive
+<div style="text-indent: 30px;">Through this sensitivity analysis, this report concluded that the model is relatively insensitive
 to the high leverage points. The outliers, however, in the data significantly reduce the R^2 value.
 The removal of high leverage points and outliers had no effect on the significance of individual
 explanatory variables because each variable was significant at a 1% significance level in each
 regression.
 	
-# EMPIRICAL ANALYSIS
+#Empirical Analysis
 
-  The data was compiled into three preliminary models: a model with categorical data (the Category
+<div style="text-indent: 30px;">The data was compiled into three preliminary models: a model with categorical data (the Category
 Model), a model using logarithmic totals of the explanatory variables (the Log Totals Model), and a
 model using percent variables (the PCT Model). The Category Model resulted in a model that was very
 general, it greatly lowered the resulting reduced-R^2, and it was very complex. With these three
@@ -146,7 +153,10 @@ Variation Inflation Factors in the Log Total Model were outrageously high. To fu
 PCT Model, this report first used all variables in the initial run of linear models. Then, using an
 F-Test on only the statistically significant, the desired reduced model was created.
 
-  From the reduced model, the PCT Model, this report will comment on the data’s anomalies and
+![](https://github.com/PDBoegel/HeartMortality/raw/master/bCoef.png)
+
+
+<div style="text-indent: 30px;">From the reduced model, the PCT Model, this report will comment on the data’s anomalies and
 formulate its findings. Contrarily to what would be expected, the PCTMALE beta is negative, implying
 that as the male population of a county increases, Heart Disease mortality would be predicted to
 decrease according to the PCT Model; this is not intuitively expected because men have a higher
@@ -174,9 +184,9 @@ impact was PCTDIABETES with coefficient 0.33450356. The smallest impact belonged
 with coefficient -0.02203009, likely since the population of Asian Americans is relatively small
 compared to other proportions of the general population. 
  
-# CONCLUDING REMARKS
+#Concluding Remarks
   
-  Throughout the direction of this report, the aim has been to provide sound significant evidence (or
+<div style="text-indent: 30px;">Throughout the direction of this report, the aim has been to provide sound significant evidence (or
 lack of evidence) to the impact socioeconomic factors of counties of the United States have on Heart
 Disease mortality. To do this, data was gathered primarily from government regulated sources, such as
 the U.S. Census, and then fitted into linear models. The linear models revealed that how important
@@ -193,11 +203,11 @@ area on Heart Disease need not be limited to the United States, but rather could
 countries individually and to the globe altogether. By combining its effects in a global stage, one
 could show how socioeconomic factors by area impacts humanity as a whole.
 
-# Appendix
+#Appendix
 
-## A
+##A
 
-### R Code
+###R Code
 
 ```{r}
 heartmortCOMPLETE = read.csv(file = "https://raw.githubusercontent.com/PDBoegel/HeartMortality/master/HeartMort.csv", header = TRUE)
@@ -205,7 +215,7 @@ heartmort = heartmortCOMPLETE[-c(1:4,7,24:26)] #Getting rid of variables for met
 options(max.print = 4000)
 ```
 
-### Basic data manipulation to better fit normality assumptions for linear models
+###Basic data manipulation to better fit normality assumptions for linear models
 
 ```{r}
 heartmort$PCTPOPUNDER65 = heartmortCOMPLETE$PCTPOP30TO65 + heartmortCOMPLETE$PCTPOPUNDER30 # To account for elderly population
@@ -234,9 +244,9 @@ logCols <- c("LNPOPSIZE","LNHDMORTPERPERSON","LNPOPDENSITY","LNHOUSINGUNITS","LN
 heartmort[logCols] <- log(heartmort[1:6])
 ```
 
-### linear model analysis 
+###linear model analysis 
 
-#### Three beggining full candidate models
+####Three beggining full candidate models
 
 ```{r}
 attach(heartmort)
@@ -254,7 +264,7 @@ catlm = lm(LNHDMORTPERPERSON ~ factor(CATLOWEDU) + factor(CATMEDEDU) + factor(CA
 # Look at Appendix C for summary(catlm)
 ```
 
-#### Reduced model
+####Reduced model
 
 ```{r}
 model <- lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTMALE) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmort)
@@ -262,9 +272,9 @@ model <- lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTA
 # Look at Appendix C for anova(model, pctlm) 
 ```
 
-### Sensitivity Analysis 
+###Sensitivity Analysis 
 
-#### Model without high leverage points
+####Model without high leverage points
 
 ```{r}
 leverage = hatvalues(model) 
@@ -278,7 +288,7 @@ modelNoLev <- lm(LNHDMORTPERPERSON ~ LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIANAM + 
 # Look at Appendix C for summary(modelNoLev)
 ```
 
-#### Model without high standardized residuals
+####Model without high standardized residuals
 
 ```{r}
 resid = as.numeric(which(abs(rstandard(model)) > 2))
@@ -287,7 +297,7 @@ modelNoHighResid <- lm(LNHDMORTPERPERSON ~ LNTOTHIGHEDU + LNTOTAFRAM + LNTOTASIA
 # Look at Appendix C for summary(modelNoHighResid)
 ```
 
-#### Model without both high std residuals and leverage points
+####Model without both high std residuals and leverage points
 
 ```{r}
 heartmortFinal = heartmort[c(-resid,-levs),]
@@ -295,9 +305,9 @@ modelFinal <- lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log
 # Look at Appendix C for summary(modelFinal)
 ```
 
-### Collinearity
+###Collinearity
 
-#### Table of Correlations
+####Table of Correlations
 ```{r, message=FALSE, warning=FALSE}
 #Tables split up into correlations we were worried about being collinear
 
@@ -311,78 +321,87 @@ cor(heartmort[12:17])
 cor(heartmort[c(1,3:6)])
 ```
 
-#### Variance Inflation Factors
+####Variance Inflation Factors
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(faraway)
 vif(modelFinal)
 ```
 
-## B 
+##B 
 
-### 1. Summary statistics and histograms of original variables
-
-```{r, results='hide'}
+###1. Summary statistics and histograms of original variables
+```{r}
 summaryOfVars
+```
+```{r, results='hide'}
+
+par(mfrow = c(2,3))
+lapply(1:19, function(i) boxplot(heartmort[,i], xlab = names(heartmort)[i], main = paste("boxplot of", names(heartmort)[i])))
+```
+```{r, echo=FALSE}
+par(mfrow = c(2,3))
+```
+```{r, results='hide'}
 par(mfrow = c(2,3))
 lapply(1:19, function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i])))
 ```
 
-### 2. Summary statistics and histograms of transformed variables
+###2. Summary statistics and histograms of transformed variables
 
 ```{r, results='hide'}
 par(mfrow = c(2,3))
 lapply(c(20:32,47:52), function(i) hist(heartmort[,i], xlab = names(heartmort)[i], main = paste("Histogram of", names(heartmort)[i]))) 
 ```
 
-## C
+##C
 
-### 1. Linear model using Log Totals
+###1. Linear model using Log Totals
 
 ```{r}
 summary(totlm)
 ```
 
-### 2. Linear model using Categorical
+###2. Linear model using Categorical
 
 ```{r}
 summary(catlm)
 ```
 
-### 3. Linear model using log percentages
+###3. Linear model using log percentages
 
 ```{r}
 summary(pctlm)
 ```
 
-### 4. Reduced linear model with log percents
+###4. Reduced linear model with log percents
 
 ```{r}
 summary(model)
 anova(model, pctlm)
 ```
 
-### 5. Reduced linear model with log percents without high leverage points
+###5. Reduced linear model with log percents without high leverage points
 
 ```{r}
 hist(leverage, main="Histogram of Leverages", xlab = "Leverage", breaks = 15)
 summary(modelNoLev)
 ```
 
-### 6. Reduced linear model with log percents without outliers
+###6. Reduced linear model with log percents without outliers
 ```{r}
 hist(rstandard(model), main="Histogram of Standardized Residuals", xlab = "Standardized Residual")
 summary(modelNoHighResid)
 ```
 
-### 7. Final model with log percents that do no contain outliers or high leverage points
+###7. Final model with log percents that do no contain outliers or high leverage points
 ```{r}
 summary(modelFinal)
 ```
 
-## D
+##D
 
-### 1. Added Variable Plot for PCTMALE
+###1. Added Variable Plot for PCTMALE
 
 ```{r}
 e1 = lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTPOPUNDER65) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmort)
@@ -396,7 +415,7 @@ plot(e1resid,e2resid,main = "Added Variable Plot")
 abline(lm(e1resid ~ e2resid), col="red")
 ```
 
-### 2. Added Variable Plot for PCTPOPUNDER65
+###2. Added Variable Plot for PCTPOPUNDER65
 
 ```{r}
 e3 = lm(LNHDMORTPERPERSON ~ log(LOWEDUCATION) + log(MEDEDUCATION) + log(PCTAFRAM) + log(PCTASIANAM) + log(PCTDIABETES) + log(PCTMALE) + log(PCTOBESE) + log(PCTWHITE) + LNPOPDENSITY + LNHOUSINGUNITSDENSITY, data = heartmortFinal)
@@ -410,7 +429,7 @@ plot(e3resid,e4resid,main = "Added Variable Plot")
 abline(lm(e4resid ~ e3resid), col="red")
 ```
 
-## E
+##E
 
 **Coefficents and t-statistics for the final model**
 
@@ -421,7 +440,10 @@ tvalues = c(-49.987 , 16.058 , 11.631 , 9.069 , -4.988 , 15.298 , -3.545 , 13.43
 betaframe = data.frame(coefficients , tvalues)
 betaframe
 ```
-```{r, echo=FALSE,eval=FALSE}
+
+##H
+
+```{r, warning=FALSE, message=FALSE}
 # **Proving there are no observations that are high leverage points AND outliers**
-sum((which(abs(rstandard(model)) > 2) == which(leverage > 3*averagelev))
+sum((which(abs(rstandard(model)) > 2) == which(leverage > 3*averagelev)))
 ```
